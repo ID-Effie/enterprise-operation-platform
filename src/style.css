@@ -1,0 +1,15 @@
+/* 元素实际宽度 = width + padding + border
+  容易把布局撑爆。而 border-box 后：元素实际宽度 = width
+  padding 和 border 会自动算进去。*/
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0; /*去掉浏览器默认外边距。否则页面四周会有白边。*/
+  font-family: Arial, Helvetica, sans-serif; /*默认字体依次往下*/
+}
+
+#app {
+  min-height: 100vh; /*#app 最小高度 = 整个屏幕高度，这样页面至少会撑满整个屏幕。*/
+}
