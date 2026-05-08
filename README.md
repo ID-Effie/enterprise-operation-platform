@@ -1,5 +1,34 @@
-# Vue 3 + TypeScript + Vite
+# Enterprise Operation Platform
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+一个基于 Vue 3、TypeScript、Vite 的中后台练习项目。
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## 技术栈
+
+- Vue 3
+- TypeScript
+- Vite
+- pnpm
+
+## 当前进度
+
+- Day 1：完成项目初始化
+- 已清理默认页面
+- 已建立基础目录结构
+
+## 目录结构
+
+- src/views：页面组件
+- src/components：通用组件
+- src/router：路由配置
+- src/stores：状态管理
+- src/api：接口请求
+- src/utils：工具函数
+- src/types：类型定义
+- src/styles：全局样式
+
+## 启动方式
+
+```bash
+pnpm install
+pnpm dev
+```
