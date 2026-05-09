@@ -1,15 +1,205 @@
-/* 元素实际宽度 = width + padding + border
-  容易把布局撑爆。而 border-box 后：元素实际宽度 = width
-  padding 和 border 会自动算进去。*/
+/* 全局盒模型重置：
+  默认情况下，元素实际宽度 = width + padding + border，容易把布局撑爆。
+  设置 border-box 后，元素实际宽度就是 width，padding 和 border 会自动算在里面。 */
 * {
   box-sizing: border-box;
 }
 
 body {
-  margin: 0; /*去掉浏览器默认外边距。否则页面四周会有白边。*/
-  font-family: Arial, Helvetica, sans-serif; /*默认字体依次往下*/
+  margin: 0; /* 去掉浏览器默认外边距，否则页面四周会有白边。 */
+  font-family:
+    Arial, Helvetica, sans-serif; /* 默认字体依次往下找，前面的字体不可用就用后面的。 */
+  color: #172033; /* 设置全站默认文字颜色，子元素默认会继承这个颜色。 */
+  background: #f5f7fb; /* 设置全站背景色，让页面不是纯白。 */
 }
 
 #app {
-  min-height: 100vh; /*#app 最小高度 = 整个屏幕高度，这样页面至少会撑满整个屏幕。*/
+  min-height: 100vh; /* #app 最小高度 = 整个屏幕高度，这样页面至少会撑满整个屏幕。 */
+}
+
+a {
+  color: inherit; /* 链接继承父元素文字颜色，避免浏览器默认蓝色影响设计。 */
+  text-decoration: none; /* 去掉链接默认下划线。 */
+}
+
+button,
+input {
+  font: inherit; /* 表单控件默认字体可能和页面不同，这里让它继承页面字体。 */
+}
+
+/* 登录页和 404 页都是单屏居中布局，所以复用同一组页面容器样式。 */
+.auth-page,
+.not-found-page {
+  display: grid; /* 使用 grid 是为了方便把内部面板居中。 */
+  min-height: 100vh; /* 页面高度至少等于视口高度。 */
+  place-items: center; /* grid 的水平和垂直方向都居中。 */
+  padding: 32px; /* 给小屏幕边缘留出安全距离，避免内容贴边。 */
+}
+
+/* 登录面板和 404 面板都是白色卡片，所以共用面板样式。 */
+.auth-panel,
+.not-found-page section {
+  width: min(100%, 420px); /* 宽度不超过 420px，但在窄屏下最多占满父容器。 */
+  border: 1px solid #d8deea; /* 浅色边框，用来区分面板和背景。 */
+  border-radius: 8px; /* 轻微圆角，让面板更柔和。 */
+  background: #ffffff; /* 面板使用白底，提高内容可读性。 */
+  padding: 32px; /* 面板内部留白。 */
+}
+
+.eyebrow {
+  margin: 0 0 8px; /* 上方不留空，下方和标题拉开 8px。 */
+  color: #4f6f52; /* 小标题使用强调色，和正文形成层级。 */
+  font-size: 13px; /* eyebrow 是辅助标签，字号要小于主标题。 */
+  font-weight: 700; /* 加粗增强识别度。 */
+  text-transform: uppercase; /* 英文自动转成大写，常用于标题上方的小标签。 */
+}
+
+h1,
+h2,
+p {
+  margin-top: 0; /* 清掉标题和段落默认上边距，避免布局间距不可控。 */
+}
+
+h1 {
+  margin-bottom: 12px; /* 主标题和下方描述保持稳定距离。 */
+  font-size: 32px; /* 页面主标题字号。 */
+  line-height: 1.15; /* 控制行高，避免标题多行时太松散。 */
+}
+
+h2 {
+  margin-bottom: 16px; /* 区块标题和内容之间的距离。 */
+  font-size: 22px; /* 区块标题字号，比 h1 小。 */
+}
+
+.description {
+  color: #5f6b7f; /* 描述文字用弱一点的颜色，降低视觉重量。 */
+  line-height: 1.6; /* 描述文字通常较长，行高大一点更好读。 */
+}
+
+.login-form {
+  display: grid; /* 表单项按纵向排列。 */
+  gap: 16px; /* 每个表单项之间的统一间距。 */
+  margin-top: 24px; /* 表单和上方描述拉开距离。 */
+}
+
+.login-form label {
+  display: grid; /* label 里的文字和 input 纵向排列。 */
+  gap: 8px; /* label 文案和输入框之间的距离。 */
+  color: #3b4658; /* 表单标签文字颜色。 */
+  font-weight: 700; /* 表单标签加粗，方便扫描。 */
+}
+
+.login-form input {
+  width: 100%; /* 输入框占满表单宽度。 */
+  border: 1px solid #cbd4e1; /* 输入框边框。 */
+  border-radius: 6px; /* 输入框圆角。 */
+  padding: 11px 12px; /* 输入框内部留白，让文字不贴边。 */
+  color: #172033; /* 输入内容颜色。 */
+  background: #ffffff; /* 输入框背景色。 */
+}
+
+/* 主按钮和次按钮共用尺寸、对齐方式，只在颜色上区分。 */
+.primary-link,
+.secondary-link {
+  display: inline-flex; /* 让链接可以像按钮一样设置高度和居中。 */
+  min-height: 42px; /* 保证按钮有稳定点击区域。 */
+  align-items: center; /* 垂直居中按钮文字。 */
+  justify-content: center; /* 水平居中按钮文字。 */
+  border-radius: 6px; /* 按钮圆角。 */
+  padding: 0 16px; /* 左右留白，适配不同长度文字。 */
+  font-weight: 700; /* 按钮文字加粗。 */
+}
+
+.primary-link {
+  color: #ffffff; /* 主按钮使用白色文字。 */
+  background: #2f6f73; /* 主按钮背景色，用于主要操作。 */
+}
+
+.secondary-link {
+  border: 1px solid #cbd4e1; /* 次按钮使用边框表达层级。 */
+  color: #2f4058; /* 次按钮文字颜色。 */
+  background: #ffffff; /* 次按钮背景保持白色。 */
+}
+
+.dashboard-page {
+  width: min(100%, 1120px); /* 页面内容最大宽度 1120px，窄屏下占满可用宽度。 */
+  margin: 0 auto; /* 当内容宽度小于屏幕宽度时，整体水平居中。 */
+  padding: 32px; /* 页面四周留白。 */
+}
+
+.topbar {
+  display: flex; /* 标题区域和导航区域横向排列。 */
+  gap: 24px; /* 标题和导航之间的最小间距。 */
+  align-items: center; /* 垂直方向居中对齐。 */
+  justify-content: space-between; /* 左侧标题、右侧导航分布在两端。 */
+  margin-bottom: 24px; /* 顶部栏和下方指标区之间的距离。 */
+}
+
+.page-nav,
+.actions {
+  display: flex; /* 导航链接和操作按钮横向排列。 */
+  flex-wrap: wrap; /* 空间不足时允许换行，避免内容溢出。 */
+  gap: 10px; /* 链接或按钮之间的间距。 */
+}
+
+.page-nav a {
+  border: 1px solid #cbd4e1; /* 导航项边框。 */
+  border-radius: 6px; /* 导航项圆角。 */
+  padding: 10px 14px; /* 导航项内部留白。 */
+  color: #2f4058; /* 导航文字颜色。 */
+  background: #ffffff; /* 导航项背景。 */
+  font-weight: 700; /* 导航文字加粗。 */
+}
+
+.metrics-grid {
+  display: grid; /* 使用 grid 做三列指标布局。 */
+  grid-template-columns: repeat(
+    3,
+    minmax(0, 1fr)
+  ); /* 三列等宽，minmax(0, 1fr) 可减少内容撑破列宽的风险。 */
+  gap: 16px; /* 指标卡片之间的间距。 */
+  margin-bottom: 24px; /* 指标区和下方内容区之间的距离。 */
+}
+
+.metric-card,
+.content-section {
+  border: 1px solid #d8deea; /* 卡片边框。 */
+  border-radius: 8px; /* 卡片圆角。 */
+  background: #ffffff; /* 卡片背景。 */
+  padding: 24px; /* 卡片内部留白。 */
+}
+
+.metric-card span {
+  display: block; /* span 默认是行内元素，转成块级后才能稳定设置上下间距。 */
+  margin-bottom: 12px; /* 指标名称和数字之间的距离。 */
+  color: #5f6b7f; /* 指标名称颜色弱一些，突出下面的数字。 */
+}
+
+.metric-card strong {
+  display: block; /* 数字单独占一行。 */
+  font-size: 34px; /* 指标数字需要更醒目。 */
+}
+
+.content-section li {
+  margin-bottom: 10px; /* 列表项之间的距离。 */
+  color: #3b4658; /* 列表文字颜色。 */
+}
+
+/* 响应式布局：
+  当屏幕宽度小于等于 720px 时，使用下面这组移动端样式。 */
+@media (max-width: 720px) {
+  .topbar {
+    align-items: flex-start; /* 小屏下左对齐标题和导航。 */
+    flex-direction: column; /* 小屏下从横向排列改成上下排列，避免挤在一行。 */
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr; /* 小屏下三列指标改成单列。 */
+  }
+
+  .dashboard-page,
+  .auth-page,
+  .not-found-page {
+    padding: 20px; /* 小屏空间有限，减少页面边距。 */
+  }
 }

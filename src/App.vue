@@ -1,14 +1,6 @@
 <template>
-  <div class="app">
-    <h1>Enterprise Operation Platform</h1>
-    <p>主项目初始化完成</p>
-  </div>
+  <!-- RouterView 可以理解为一个“页面出口”。App.vue 变成路由页面的容器 -->
+  <RouterView />
 </template>
 
 <script setup lang="ts"></script>
-
-<style scoped>
-.app {
-  padding: 24px;
-}
-</style>
