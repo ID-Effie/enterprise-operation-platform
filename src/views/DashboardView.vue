@@ -1,18 +1,5 @@
 <template>
-  <main class="dashboard-page">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Dashboard</p>
-        <h1>运营概览</h1>
-      </div>
-
-      <nav class="page-nav" aria-label="基础路由">
-        <RouterLink to="/dashboard">首页</RouterLink>
-        <RouterLink to="/login">登录页</RouterLink>
-        <RouterLink to="/missing-page">404 测试</RouterLink>
-      </nav>
-    </header>
-
+  <div class="dashboard-page">
     <section class="metrics-grid">
       <article class="metric-card">
         <span>今日订单</span>
@@ -38,7 +25,7 @@
         <li>保持页面职责清晰，暂不追求复杂 UI。</li>
       </ul>
     </section>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts"></script>

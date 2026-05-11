@@ -121,18 +121,107 @@ h2 {
   background: #ffffff; /* 次按钮背景保持白色。 */
 }
 
-.dashboard-page {
-  width: min(100%, 1120px); /* 页面内容最大宽度 1120px，窄屏下占满可用宽度。 */
-  margin: 0 auto; /* 当内容宽度小于屏幕宽度时，整体水平居中。 */
-  padding: 32px; /* 页面四周留白。 */
+.app-layout {
+  display: grid; /* 后台主布局使用 grid，方便分成左侧菜单和右侧内容两列。 */
+  grid-template-columns:
+    240px
+    minmax(
+      0,
+      1fr
+    ); /* 左侧固定 240px，右侧占满剩余空间；minmax(0, 1fr) 避免内容把右侧列撑爆。 */
+  min-height: 100vh; /* 布局高度至少等于一屏，让侧边栏能从顶部延伸到底部。 */
 }
 
-.topbar {
-  display: flex; /* 标题区域和导航区域横向排列。 */
-  gap: 24px; /* 标题和导航之间的最小间距。 */
-  align-items: center; /* 垂直方向居中对齐。 */
-  justify-content: space-between; /* 左侧标题、右侧导航分布在两端。 */
-  margin-bottom: 24px; /* 顶部栏和下方指标区之间的距离。 */
+.app-sidebar {
+  display: flex; /* 侧边栏内部用 flex 纵向排列品牌区和菜单区。 */
+  flex-direction: column; /* 品牌在上，菜单在下。 */
+  gap: 28px; /* 品牌区和菜单之间留出稳定间距。 */
+  border-right: 1px solid #d8deea; /* 右边框把侧边栏和内容区分开。 */
+  background: #ffffff; /* 侧边栏使用白底，形成后台系统常见的固定导航区域。 */
+  padding: 24px 18px; /* 给侧边栏内容留出呼吸空间。 */
+}
+
+.brand {
+  display: flex; /* 品牌图标和品牌文字横向排列。 */
+  gap: 12px; /* 图标和文字之间的距离。 */
+  align-items: center; /* 图标和文字在垂直方向居中对齐。 */
+}
+
+.brand-mark {
+  display: inline-flex; /* 让品牌缩写可以在方块内水平垂直居中。像 span 一样可以和别的元素同行 */
+  width: 42px; /* 固定图标宽度，避免品牌区域抖动。 */
+  height: 42px; /* 固定图标高度，和宽度组成方形标识。 */
+  align-items: center; /* 垂直居中 EP 文本。 */
+  justify-content: center; /* 子元素水平居中 EP 文本。 */
+  border-radius: 8px; /* 轻微圆角，和项目整体卡片圆角保持一致。 */
+  color: #ffffff; /* 深色背景上使用白色文字。 */
+  background: #2f6f73; /* 品牌主色，用来强化系统识别。 */
+  font-weight: 700; /* 品牌缩写加粗，提升识别度。 */
+}
+
+.brand strong,
+.brand small {
+  display: block; /*变成块级元素，能够换行，本来行内元素不会换行*/
+}
+
+.brand small {
+  margin-top: 4px; /* 英文副标题和主标题之间保持小间距。 */
+  color: #5f6b7f; /* 副标题颜色弱一些，避免抢主标题层级。 */
+  font-size: 12px; /* 副标题字号更小，作为辅助信息。 */
+}
+
+.side-menu {
+  display: grid; /* 菜单项纵向排列。 */
+  gap: 8px; /* 每个菜单项之间留出间距，方便点击和扫描。 */
+}
+
+.side-menu-item {
+  border-radius: 6px; /* 菜单项圆角，和按钮、输入框保持统一。 */
+  padding: 12px 14px; /* 增大点击区域，让菜单更容易点。 */
+  color: #3b4658; /* 默认菜单文字颜色。 */
+  font-weight: 700; /* 菜单文字加粗，提升导航可读性。 */
+}
+
+.side-menu-item:hover,
+.side-menu-item.router-link-active {
+  color: #235d61; /* hover 和当前路由状态使用强调色。 */
+  background: #e8f2f1; /* 当前菜单高亮背景，帮助用户知道自己在哪个页面。 */
+}
+
+.app-shell {
+  min-width: 0; /* 允许右侧内容区在窄屏或长文本场景下正确收缩，不把 grid 撑宽。 */
+}
+
+.app-header {
+  display: flex; /* 顶部栏左右排列：左侧页面标题，右侧用户信息。 */
+  min-height: 88px; /* 固定顶部栏最小高度，保证页面切换时结构稳定。 */
+  align-items: center; /* 顶部栏内容垂直居中。 */
+  justify-content: space-between; /* 标题靠左，用户信息靠右。 */
+  border-bottom: 1px solid #d8deea; /* 底部分隔线，把顶部栏和内容区区分开。 */
+  background: #ffffff; /* 顶部栏白底，和侧边栏形成统一后台框架。 */
+  padding: 20px 32px; /* 顶部栏左右留白，避免内容贴边。 */
+}
+
+.app-header h1 {
+  margin-bottom: 0; /* 顶部栏标题下方不再额外占空间。 */
+  font-size: 26px; /* 后台内页标题不使用过大的 hero 字号。 */
+}
+
+.header-user {
+  border: 1px solid #cbd4e1; /* 用户信息区域用浅边框做轻量区分。 */
+  border-radius: 6px; /* 和菜单、按钮圆角保持一致。 */
+  padding: 9px 12px; /* 形成稳定可点击/可识别的块状区域。 */
+  color: #2f4058; /* 用户名文字颜色。 */
+  background: #ffffff; /* 保持顶部栏干净克制。 */
+  font-weight: 700; /* 用户名加粗，方便识别。 */
+}
+
+.app-content {
+  padding: 32px; /* 内容区统一留白，避免页面内容贴着顶部栏和边缘。 */
+}
+
+.dashboard-page {
+  width: 100%; /* 首页内容占满右侧内容区宽度。 */
 }
 
 .page-nav,
@@ -188,18 +277,49 @@ h2 {
 /* 响应式布局：
   当屏幕宽度小于等于 720px 时，使用下面这组移动端样式。 */
 @media (max-width: 720px) {
-  .topbar {
-    align-items: flex-start; /* 小屏下左对齐标题和导航。 */
-    flex-direction: column; /* 小屏下从横向排列改成上下排列，避免挤在一行。 */
+  .app-layout {
+    grid-template-columns: 1fr; /* 小屏下取消左右两列，改成上下结构。 */
+  }
+
+  .app-sidebar {
+    border-right: 0; /* 小屏下侧边栏不在左侧，所以去掉右边框。 */
+    border-bottom: 1px solid #d8deea; /* 改用底边框分隔导航区和内容区。 */
+    padding: 18px; /* 小屏空间更紧凑，减少侧边栏内边距。 */
+  }
+
+  .side-menu {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    ); /* 小屏菜单改成两列，减少纵向占用空间。 */
+  }
+
+  .app-header {
+    align-items: flex-start; /* 小屏下标题和用户信息左对齐。 */
+    flex-direction: column; /* 顶部栏内容从左右排列改成上下排列，避免挤在一行。 */
+    gap: 14px; /* 标题区和用户信息之间的间距。 */
+    padding: 20px; /* 小屏顶部栏留白略收紧。 */
+  }
+
+  .app-content {
+    padding: 20px; /* 小屏内容区减少边距，给正文更多空间。 */
   }
 
   .metrics-grid {
     grid-template-columns: 1fr; /* 小屏下三列指标改成单列。 */
   }
 
-  .dashboard-page,
   .auth-page,
   .not-found-page {
     padding: 20px; /* 小屏空间有限，减少页面边距。 */
   }
 }
+/* 后台式左右布局：.app-layout
+侧边栏：.app-sidebar
+品牌区：.brand、.brand-mark
+侧边栏菜单：.side-menu、.side-menu-item
+当前菜单高亮：.router-link-active
+顶部栏：.app-header
+用户信息：.header-user
+内容区：.app-content
+移动端适配：@media (max-width: 720px) */
