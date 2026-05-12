@@ -6,6 +6,7 @@ import NotFoundView from "../views/NotFoundView.vue";
 import CustomersView from "../views/CustomersView.vue";
 import OrdersView from "../views/OrdersView.vue";
 import SystemView from "../views/SystemView.vue";
+import UsersView from "../views/UsersView.vue";
 
 //createWebHistory() 表示使用正常 URL 模式（/dashboard）而不是 hash 模式（/#/dashboard）
 const router = createRouter({
@@ -56,6 +57,17 @@ const router = createRouter({
         {
           path: "",
           component: OrdersView,
+        },
+      ],
+    },
+    {
+      path: "/users",
+      name: "users",
+      component: BasicLayout,
+      children: [
+        {
+          path: "",
+          component: UsersView,
         },
       ],
     },

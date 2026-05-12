@@ -54,6 +54,7 @@ const menus: MenuItem[] = [
   { title: "首页", path: "/dashboard" },
   { title: "客户管理", path: "/customers" },
   { title: "订单管理", path: "/orders" },
+  { title: "用户管理", path: "/users" },
   { title: "系统管理", path: "/system" },
 ];
 

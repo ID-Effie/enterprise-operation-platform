@@ -274,6 +274,77 @@ h2 {
   color: #3b4658; /* 列表文字颜色。 */
 }
 
+.business-page {
+  display: grid; /* 业务页面内部按标题、查询区、操作区、表格区纵向排列。 */
+  gap: 20px; /* 各业务区块之间保持统一间距，避免页面内容挤在一起。 */
+}
+
+.page-heading h2 {
+  margin-bottom: 8px; /* 页面标题和描述文字之间保持较小间距。 */
+}
+
+.query-panel {
+  display: grid; /* 查询表单使用 grid，方便输入框和按钮在同一行对齐。 */
+  grid-template-columns: repeat(2, minmax(180px, 1fr)) auto auto; /* 两个查询项占主要宽度，查询和重置按钮按内容宽度排列。 */
+  gap: 12px; /* 查询项和按钮之间保持固定间距。 */
+  align-items: end; /* 按钮和输入框底部对齐，形成后台表单常见布局。 */
+  border: 1px solid #d8deea; /* 给查询区一个轻边框，和普通页面内容区分层。 */
+  border-radius: 8px; /* 查询区圆角和卡片圆角保持一致。 */
+  background: #f8fafc; /* 查询区使用浅底色，突出这是筛选条件区域。 */
+  padding: 16px; /* 查询区内部留白，避免表单控件贴边。 */
+}
+
+.query-panel label {
+  display: grid; /* label 内的字段名和输入框纵向排列。 */
+  gap: 8px; /* 字段名和输入框之间保持清晰距离。 */
+  color: #3b4658; /* 查询标签使用正文偏深色，保证可读性。 */
+  font-weight: 700; /* 查询标签加粗，方便快速扫描筛选项。 */
+}
+
+.query-panel input {
+  width: 100%; /* 输入框占满所在 grid 单元，保证左右对齐。 */
+  border: 1px solid #cbd4e1; /* 输入框使用浅边框，和登录表单风格保持一致。 */
+  border-radius: 6px; /* 输入框圆角和项目里的表单控件统一。 */
+  padding: 10px 12px; /* 输入框内部留白，让占位文字不贴边。 */
+  color: #172033; /* 输入文字颜色沿用全站正文色。 */
+  background: #ffffff; /* 输入框使用白底，和浅色查询区形成区分。 */
+}
+
+.table-toolbar {
+  display: flex; /* 操作按钮横向排列，符合中后台工具栏习惯。 */
+  flex-wrap: wrap; /* 空间不足时按钮允许换行，避免小屏溢出。 */
+  gap: 10px; /* 操作按钮之间保持稳定间距。 */
+}
+
+/* table-placeholder 宽度跟随父容器，不会天然溢出 */
+.table-placeholder {
+  overflow: hidden; /* 让表头背景和内容区域被圆角裁切，不露出直角。 */
+  border: 1px dashed #b8c3d4; /* 虚线边框表示这里是后续替换为真实表格的占位区。 */
+  border-radius: 8px; /* 表格占位区圆角和页面卡片保持一致。 */
+  background: #ffffff; /* 表格区域使用白底，保持数据区的清爽感。 */
+}
+
+.table-header {
+  display: grid; /* 表头用 grid 模拟四列表格结构。 */
+  grid-template-columns: repeat(
+    4,
+    minmax(0, 1fr)
+  ); /* 四列等宽，minmax(0, 1fr) 避免长文本撑破列宽。 */
+  gap: 12px; /* 表头列之间留出间距，避免文字贴得太近。 */
+  border-bottom: 1px solid #d8deea; /* 表头和空数据提示之间增加分隔线。 */
+  background: #eef3f6; /* 表头使用浅灰蓝底，和表格内容形成层级。 */
+  padding: 14px 16px; /* 表头内部留白，让列标题更稳。 */
+  color: #2f4058; /* 表头文字使用深灰蓝色，降低纯黑的压迫感。 */
+  font-weight: 700; /* 表头加粗，明确这是字段名称。 */
+}
+
+.table-placeholder p {
+  margin: 0; /* 清掉段落默认外边距，避免空数据提示撑出额外间距。 */
+  padding: 28px 16px; /* 空数据提示保留足够高度，让占位表格更像真实数据区。 */
+  color: #5f6b7f; /* 空数据提示使用弱文字色，避免抢表头层级。 */
+  text-align: center; /* 空数据提示居中，符合常见表格空状态表达。 */
+}
+
 /* 响应式布局：
   当屏幕宽度小于等于 720px 时，使用下面这组移动端样式。 */
 @media (max-width: 720px) {
@@ -309,12 +380,21 @@ h2 {
     grid-template-columns: 1fr; /* 小屏下三列指标改成单列。 */
   }
 
+  .query-panel {
+    grid-template-columns: 1fr; /* 小屏下查询区改成单列，避免输入框和按钮挤在一行。 */
+  }
+
+  .table-header {
+    grid-template-columns: 1fr 1fr; /* 小屏下表头改成两列，减少横向滚动和文字拥挤。 */
+  }
+
   .auth-page,
   .not-found-page {
     padding: 20px; /* 小屏空间有限，减少页面边距。 */
   }
 }
-/* 后台式左右布局：.app-layout
+/* 
+后台式左右布局：.app-layout
 侧边栏：.app-sidebar
 品牌区：.brand、.brand-mark
 侧边栏菜单：.side-menu、.side-menu-item
@@ -322,4 +402,6 @@ h2 {
 顶部栏：.app-header
 用户信息：.header-user
 内容区：.app-content
-移动端适配：@media (max-width: 720px) */
+移动端适配：@media (max-width: 720px) 
+
+*/
