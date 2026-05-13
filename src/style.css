@@ -97,6 +97,17 @@ h2 {
   color: #172033; /* 输入内容颜色。 */
   background: #ffffff; /* 输入框背景色。 */
 }
+.login-error {
+  margin: 0;
+  border: 1px solid #f0b8b8;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #b42318;
+  background: #fff3f3;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
 
 /* 主按钮和次按钮共用尺寸、对齐方式，只在颜色上区分。 */
 .primary-link,

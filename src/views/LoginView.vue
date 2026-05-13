@@ -5,21 +5,56 @@
       <h1>登录工作台</h1>
       <p class="description">进入运营平台，查看今日业务概览与待处理事项。</p>
 
-      <form class="login-form">
+      <form class="login-form" @submit.prevent="handleLogin">
         <label>
           <span>账号</span>
-          <input type="text" placeholder="admin@example.com" />
+          <input v-model="username" type="text" placeholder="请输入账号" />
         </label>
 
         <label>
           <span>密码</span>
-          <input type="password" placeholder="请输入密码" />
+          <input v-model="password" type="password" placeholder="请输入密码" />
         </label>
 
-        <RouterLink class="primary-link" to="/dashboard">登录</RouterLink>
+        <p v-if="errorMessage" class="login-error">
+          {{ errorMessage }}
+        </p>
+
+        <button class="primary-link" type="submit" :disabled="loading">
+          {{ loading ? "登录中..." : "登录" }}
+        </button>
       </form>
     </section>
   </main>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { login } from "../api/modules/auth";
+
+const username = ref("");
+const password = ref("");
+const loading = ref(false);
+const errorMessage = ref("");
+
+const router = useRouter();
+
+async function handleLogin() {
+  try {
+    loading.value = true;
+    errorMessage.value = "";
+
+    await login({
+      username: username.value,
+      password: password.value,
+    });
+
+    router.push("/dashboard");
+  } catch {
+    errorMessage.value = "账号或密码错误";
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
