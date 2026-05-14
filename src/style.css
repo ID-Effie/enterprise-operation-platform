@@ -218,6 +218,12 @@ h2 {
   font-size: 26px; /* 后台内页标题不使用过大的 hero 字号。 */
 }
 
+.header-actions {
+  display: inline-flex; /* 用户信息和退出按钮作为一组靠右展示。 */
+  align-items: center; /* 保持两个控件在顶部栏中垂直居中。 */
+  gap: 10px; /* 用户信息和退出按钮之间留出稳定间距。 */
+}
+
 .header-user {
   border: 1px solid #cbd4e1; /* 用户信息区域用浅边框做轻量区分。 */
   border-radius: 6px; /* 和菜单、按钮圆角保持一致。 */
@@ -225,6 +231,23 @@ h2 {
   color: #2f4058; /* 用户名文字颜色。 */
   background: #ffffff; /* 保持顶部栏干净克制。 */
   font-weight: 700; /* 用户名加粗，方便识别。 */
+}
+
+.log-out {
+  min-height: 38px; /* 和用户信息高度接近，顶部栏视觉更稳。 */
+  border: 1px solid #d8a6a6; /* 使用轻量红色边框表达退出这种谨慎操作。 */
+  border-radius: 6px; /* 和项目内按钮圆角保持一致。 */
+  padding: 0 14px; /* 留出可点击区域，同时不比用户名块更抢眼。 */
+  color: #9f1d1d; /* 退出操作用红色文字提示风险。 */
+  background: #fff7f7; /* 轻微红底，比纯白更容易识别。 */
+  font-weight: 700; /* 和顶部栏其他控件保持同等重量。 */
+  cursor: pointer; /* 明确这是可点击按钮。 */
+}
+
+.log-out:hover {
+  border-color: #c24141; /* hover 时增强反馈。 */
+  color: #ffffff; /* hover 后反白，提示即将执行操作。 */
+  background: #b42318; /* 使用更明确的危险操作色。 */
 }
 
 .app-content {
@@ -383,6 +406,11 @@ h2 {
     padding: 20px; /* 小屏顶部栏留白略收紧。 */
   }
 
+  .header-actions {
+    width: 100%; /* 小屏下操作区占满一行，避免按钮挤压标题。 */
+    justify-content: space-between; /* 用户信息靠左，退出按钮靠右。 */
+  }
+
   .app-content {
     padding: 20px; /* 小屏内容区减少边距，给正文更多空间。 */
   }
@@ -414,5 +442,5 @@ h2 {
 用户信息：.header-user
 内容区：.app-content
 移动端适配：@media (max-width: 720px) 
-
+退出登录：log-out
 */

@@ -29,7 +29,10 @@
           <p class="eyebrow">Operation</p>
           <h1>{{ currentTitle }}</h1>
         </div>
-        <div class="header-user">管理员</div>
+        <div class="header-actions">
+          <div class="header-user">管理员</div>
+          <button class="log-out" type="button" @click="logOut">退出</button>
+        </div>
       </header>
 
       <!-- 内容区 Main =>当前路由页面 -->
@@ -42,7 +45,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 type MenuItem = {
   title: string;
@@ -58,11 +61,17 @@ const menus: MenuItem[] = [
   { title: "系统管理", path: "/system" },
 ];
 
-const route = useRoute(); // 获取当前路由信息。
+const route = useRoute(); // 获取当前路由信息。只能读
+const router = useRouter(); // 路由实例，可以跳转
 
 const currentTitle = computed(() => {
   const activeMenu = menus.find((item) => item.path === route.path);
 
   return activeMenu?.title ?? "运营平台";
 });
+
+function logOut() {
+  localStorage.removeItem("token");
+  router.push("/login");
+}
 </script>

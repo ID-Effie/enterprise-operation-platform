@@ -48,6 +48,10 @@ const router = createRouter({
           component: CustomersView,
         },
       ],
+      meta: {
+        title: "客户管理页面",
+        requiresAuth: true, // 可以用于后面做登录权限判断
+      },
     },
     {
       path: "/orders",
@@ -59,6 +63,10 @@ const router = createRouter({
           component: OrdersView,
         },
       ],
+      meta: {
+        title: "订单管理页面", // title 可以用于顶部栏标题、浏览器标题、面包屑
+        requiresAuth: true, // 可以用于后面做登录权限判断
+      },
     },
     {
       path: "/users",
@@ -70,6 +78,10 @@ const router = createRouter({
           component: UsersView,
         },
       ],
+      meta: {
+        title: "用户管理页", // title 可以用于顶部栏标题、浏览器标题、面包屑
+        requiresAuth: true, // 可以用于后面做登录权限判断
+      },
     },
     {
       path: "/system",
@@ -81,6 +93,10 @@ const router = createRouter({
           component: SystemView,
         },
       ],
+      meta: {
+        title: "系统管理页面", // title 可以用于顶部栏标题、浏览器标题、面包屑
+        requiresAuth: true, // 可以用于后面做登录权限判断
+      },
     },
     {
       // path: '/:pathMatch(.*)*' 是 Vue Router 4 的通配 404 路由，用来匹配所有未定义的路径，并显示 NotFound 页面。
@@ -89,6 +105,23 @@ const router = createRouter({
       component: NotFoundView,
     },
   ],
+});
+
+// beforeEach 是 Vue Router 的全局前置守卫
+// 每次路由跳转之前，都会先执行这里的逻辑。
+// 登录权限判断、页面标题设置、角色权限判断
+router.beforeEach((to) => {
+  const token = localStorage.getItem("token");
+
+  // 已登录(有token)时访问登录页，自动去首页
+  if (to.path === "/login" && token) {
+    return "/dashboard";
+  }
+  if (to.meta.requiresAuth && !token) {
+    return "/login";
+  }
+
+  return true;
 });
 
 export default router;

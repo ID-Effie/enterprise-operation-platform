@@ -45,12 +45,14 @@ async function handleLogin() {
     loading.value = true;
     errorMessage.value = "";
 
-    await login({
+    const res = await login({
       username: username.value,
       password: password.value,
     });
 
-    router.push("/dashboard");
+    localStorage.setItem("token", res.data.token);
+
+    router.push("/");
   } catch {
     errorMessage.value = "账号或密码错误";
   } finally {
