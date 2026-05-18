@@ -23,7 +23,8 @@ a {
 }
 
 button,
-input {
+input,
+select {
   font: inherit; /* 表单控件默认字体可能和页面不同，这里让它继承页面字体。 */
 }
 
@@ -335,7 +336,8 @@ h2 {
   font-weight: 700; /* 查询标签加粗，方便快速扫描筛选项。 */
 }
 
-.query-panel input {
+.query-panel input,
+.query-panel select {
   width: 100%; /* 输入框占满所在 grid 单元，保证左右对齐。 */
   border: 1px solid #cbd4e1; /* 输入框使用浅边框，和登录表单风格保持一致。 */
   border-radius: 6px; /* 输入框圆角和项目里的表单控件统一。 */
@@ -372,11 +374,89 @@ h2 {
   font-weight: 700; /* 表头加粗，明确这是字段名称。 */
 }
 
+.table-body {
+  display: grid; /* 表格内容区纵向排列每一行用户数据。 */
+}
+
+.table-state {
+  margin: 0; /* 清掉段落默认外边距，避免空状态撑出额外间距。 */
+  padding: 28px 16px; /* 空状态保留足够高度，让表格区域在加载前后不明显跳动。 */
+  color: #5f6b7f; /* 空状态使用弱文字色，避免抢表头层级。 */
+  text-align: center; /* 空状态文案居中，符合常见表格反馈样式。 */
+}
+
+.table-error {
+  display: flex; /* 错误状态同时展示错误文案和重试按钮。 */
+  align-items: center; /* 让错误文案和按钮垂直居中。 */
+  justify-content: center; /* 错误状态整体居中展示。 */
+  gap: 12px; /* 文案和重试按钮之间留出间距。 */
+  color: #9f1d1d; /* 错误文案使用红色提示风险。 */
+  background: #fff7f7; /* 错误状态使用浅红底，和普通空状态区分。 */
+}
+
+.table-row {
+  display: grid; /* 数据行和表头使用同样的四列结构，保证字段上下对齐。 */
+  grid-template-columns: repeat(
+    4,
+    minmax(0, 1fr)
+  ); /* minmax(0, 1fr) 避免昵称、角色等长文本撑破列宽。 */
+  gap: 12px; /* 每列之间保留间距，避免内容贴在一起。 */
+  align-items: center; /* 操作按钮、状态标签和文本在同一行垂直居中。 */
+  border-bottom: 1px solid #edf1f6; /* 行之间用浅分隔线，提高表格可读性。 */
+  padding: 14px 16px; /* 数据行内部留白，和表头尺寸保持接近。 */
+  color: #3b4658; /* 数据行使用正文色，层级低于表头但保持可读。 */
+}
+
+.table-row:last-child {
+  border-bottom: 0; /* 最后一行不需要分隔线，避免贴着容器底部显得杂乱。 */
+}
+
+.table-row span {
+  min-width: 0; /* 允许 grid 子项收缩，长文本才会触发省略号。 */
+  overflow: hidden; /* 超出单元格的内容隐藏。 */
+  text-overflow: ellipsis; /* 长文本用省略号处理，保持表格列宽稳定。 */
+  white-space: nowrap; /* 表格单元格默认单行显示，避免行高被个别字段撑开。 */
+}
+
+.status-pill {
+  display: inline-flex; /* 状态以标签形式展示，方便和普通文本区分。 */
+  min-height: 26px; /* 固定状态标签高度，让每行视觉节奏稳定。 */
+  align-items: center; /* 标签文字垂直居中。 */
+  border-radius: 999px; /* 状态标签使用胶囊形态，符合后台系统常见状态表达。 */
+  padding: 0 10px; /* 左右留白，让状态文字不贴边。 */
+  font-size: 13px; /* 状态是辅助信息，字号略小于正文。 */
+  font-weight: 700; /* 状态标签加粗，提高识别速度。 */
+}
+
+.status-pill--enabled {
+  color: #196b45; /* 启用状态使用绿色文字表达可用。 */
+  background: #e9f7ef; /* 浅绿色背景让状态更容易被扫到。 */
+}
+
+.status-pill--disabled {
+  color: #9f1d1d; /* 禁用状态使用红色文字表达不可用。 */
+  background: #fff0f0; /* 浅红色背景提示该账号不可用。 */
+}
+
+.table-action {
+  min-height: 32px; /* 表格内操作按钮比页面主按钮更紧凑。 */
+  border: 1px solid #cbd4e1; /* 使用轻边框，避免表格操作过于抢眼。 */
+  border-radius: 6px; /* 和项目其他控件圆角保持一致。 */
+  padding: 0 12px; /* 保证按钮有足够点击面积。 */
+  color: #2f4058; /* 操作按钮使用中性深色。 */
+  background: #ffffff; /* 表格操作按钮保持白底，和数据行融合。 */
+  font-weight: 700; /* 操作文字加粗，方便识别。 */
+  cursor: pointer; /* 明确这是可点击操作。 */
+}
+
+.table-action:hover {
+  border-color: #2f6f73; /* hover 时使用品牌色反馈。 */
+  color: #235d61; /* hover 文字跟随品牌色。 */
+  background: #e8f2f1; /* 轻微背景变化，提示当前可操作。 */
+}
+
 .table-placeholder p {
   margin: 0; /* 清掉段落默认外边距，避免空数据提示撑出额外间距。 */
-  padding: 28px 16px; /* 空数据提示保留足够高度，让占位表格更像真实数据区。 */
-  color: #5f6b7f; /* 空数据提示使用弱文字色，避免抢表头层级。 */
-  text-align: center; /* 空数据提示居中，符合常见表格空状态表达。 */
 }
 
 /* 响应式布局：
@@ -425,6 +505,10 @@ h2 {
 
   .table-header {
     grid-template-columns: 1fr 1fr; /* 小屏下表头改成两列，减少横向滚动和文字拥挤。 */
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr; /* 小屏下数据行也改成两列，和表头保持一致。 */
   }
 
   .auth-page,

@@ -44,28 +44,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
-type MenuItem = {
-  title: string;
-  path: string;
-};
+import { getUserMenus } from "@/api/modules/menu";
+import type { MenuItem } from "@/types/menu";
 
 // 菜单 path 要和路由 path 对上,否则点击菜单会进入 404 或空页面。
-const menus: MenuItem[] = [
-  { title: "首页", path: "/dashboard" },
-  { title: "客户管理", path: "/customers" },
-  { title: "订单管理", path: "/orders" },
-  { title: "用户管理", path: "/users" },
-  { title: "系统管理", path: "/system" },
-];
 
 const route = useRoute(); // 获取当前路由信息。只能读
 const router = useRouter(); // 路由实例，可以跳转
+const menus = ref<MenuItem[]>([]);
+
+onMounted(async () => {
+  const res = await getUserMenus();
+  menus.value = res.data;
+});
 
 const currentTitle = computed(() => {
-  const activeMenu = menus.find((item) => item.path === route.path);
+  const activeMenu = menus.value.find((item) => item.path === route.path);
 
   return activeMenu?.title ?? "运营平台";
 });

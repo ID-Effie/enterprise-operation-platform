@@ -1,10 +1,4 @@
-// 后端接口统一返回结构。
-// T 是泛型，表示 data 字段的具体类型由调用接口时决定。
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
+import type { ApiResponse } from "@/types/common";
 
 // 当前项目还没有真实后端，所以这里先定义 mock 请求需要的参数。
 interface MockRequestOptions<T> {
@@ -26,7 +20,9 @@ interface MockRequestOptions<T> {
 
 // request 是所有接口的统一请求入口。
 // 返回 Promise<ApiResponse<T>>，表示异步请求结束后会得到统一格式的响应。
-export function request<T>(options: MockRequestOptions<T>): Promise<ApiResponse<T>> {
+export function request<T>(
+  options: MockRequestOptions<T>,
+): Promise<ApiResponse<T>> {
   // 这里使用默认值，让调用方只传必要参数即可。
   const {
     url,

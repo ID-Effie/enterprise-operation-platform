@@ -1,14 +1,6 @@
-import { request, type ApiResponse } from "../request";
-
-export interface LoginParams {
-  username: string;
-  password: string;
-}
-
-export interface LoginResult {
-  token: string;
-  username: string;
-}
+import { request } from "../request";
+import type { ApiResponse } from "@/types/common";
+import type { LoginParams, LoginResult } from "@/types/user";
 
 // Promise<ApiResponse<LoginResult>>：
 // login 是一个异步函数，成功后返回统一响应结构，响应里的 data 是 LoginResult 类型
@@ -23,7 +15,13 @@ export function login(params: LoginParams): Promise<ApiResponse<LoginResult>> {
     message: isValid ? "登录成功" : "账号或密码错误",
     mockData: {
       token: "mock-token-001",
-      username: params.username,
+      userInfo: {
+        id: 1,
+        username: "admin",
+        role: "admin",
+        status: "enabled",
+        createdAt: "2026-05-18",
+      },
     },
   });
 }

@@ -45,6 +45,15 @@
   - `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 已接入登录校验
   - 顶部栏已新增退出登录按钮，退出后清理 token 并跳转登录页
   - 主项目已具备“登录 -> 首页 -> 侧边栏切换业务页面 -> 404”的基础演示路径
+- Day 8：TypeScript 类型接入：
+  - 已新增 `src/types/common.ts`，沉淀 `ID`、`ApiResponse<T>`、`PageParams`、`PageResult<T>`
+  - 已新增 `src/types/user.ts`，沉淀 `UserInfo`、`UserRole`、`UserStatus`、`LoginParams`、`LoginResult`
+  - 已新增 `src/types/menu.ts`，沉淀 `MenuItem`、`MenuType`
+  - 登录接口、用户信息接口、用户列表接口、菜单接口已接入业务类型
+  - `BasicLayout` 已通过 `getUserMenus()` 获取菜单，并使用 `MenuItem[]` 管理侧边栏菜单
+  - `UsersView` 已通过 `getUserList()` 获取用户列表，并使用 `UserInfo[]` 渲染用户表格
+  - 用户列表已补齐加载中、错误重试、空数据和正常数据边界状态
+  - Vite 已配置 `@` 指向 `src`，支持 `@/api/...`、`@/types/...` 路径别名
 
 ## 目录结构
 
@@ -57,8 +66,12 @@
   - `request.ts`：统一请求入口和响应结构
   - `modules/auth.ts`：认证相关接口
   - `modules/user.ts`：用户相关接口
+  - `modules/menu.ts`：菜单相关接口
 - src/utils：工具函数
 - src/types：类型定义
+  - `common.ts`：通用类型、统一响应结构、分页类型
+  - `user.ts`：用户、角色、登录相关类型
+  - `menu.ts`：菜单、权限菜单相关类型
 - src/styles：全局样式
 
 ## 当前路由
@@ -98,7 +111,7 @@
   - 顶部栏
   - 侧边栏
   - 内容区
-  - 静态菜单
+  - 通过菜单接口获取侧边栏菜单
 - 路由基础能力：
   - Vue Router 安装
   - 路由表配置
@@ -110,8 +123,11 @@
   - mock 请求函数 `request<T>()`
   - 认证接口模块 `auth`
   - 用户接口模块 `user`
+  - 菜单接口模块 `menu`
   - 登录参数类型 `LoginParams`
   - 登录结果类型 `LoginResult`
+  - 用户信息类型 `UserInfo`
+  - 菜单项类型 `MenuItem`
 - 登录流程：
   - 登录页表单输入
   - 点击登录后调用 mock 登录接口
@@ -134,18 +150,20 @@
   - 内容区
   - 查询区占位
   - 操作按钮区
-  - 表格区占位
+  - 表格区
+  - 用户表格行
+  - 用户状态标签
+  - 表格内操作按钮
   - 移动端适配
 
 ## 后续模块计划
 
-- 路由与菜单类型整理：
-  - `MenuItem`
+- 路由与菜单继续整理：
   - `RouteMeta`
+  - 菜单权限和路由权限联动
 - 业务页面细化：
   - 客户列表表格数据
   - 订单列表表格数据
-  - 用户管理表格数据
   - 系统设置表格数据
 - 工程能力：
   - 路由拆分
@@ -197,7 +215,10 @@ pnpm build
 - 首页能正常打开
 - 点击侧边栏菜单能切换到客户管理、订单管理、用户管理、系统管理
 - 当前菜单有高亮状态
-- 客户、订单、用户页面能展示统一的页面容器、查询区、操作按钮和表格占位区
+- 客户、订单页面能展示统一的页面容器、查询区、操作按钮和表格占位区
+- 用户页面能通过 mock 用户接口展示用户名称、角色、账号状态和操作按钮
+- 用户页面能展示加载中、错误重试和空数据状态
+- 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 登录页不显示后台布局
 - 登录页输入 `admin` / `123456` 后能跳转 `/dashboard`
 - 登录页输入错误账号或密码时能展示错误提示

@@ -1,6 +1,13 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
+    "strict": true, // 是否开启严格模式。学习阶段建议开启，这样 TS 才能真正帮你发现问题。
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      //是否配置了 @ 指向 src, import type { UserInfo } from '@/types/user'
+      "@/*": ["src/*"]
+    },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "types": ["vite/client"],
 
@@ -10,5 +17,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  // include 是否包含了 src/**/*.ts、src/**/*.vue, 如果没有包含，某些文件可能不会被 TS 检查到
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }
