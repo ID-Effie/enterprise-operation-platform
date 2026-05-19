@@ -14,14 +14,21 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+// 只管分页
 export interface PageParams {
   page: number;
   pageSize: number;
 }
 
+// 任意列表的分页返回结构
 export interface PageResult<T> {
   list: T[];
   total: number;
   page: number;
   pageSize: number;
+}
+
+//分页 + 通用搜索条件
+export interface ListQuery extends PageParams {
+  keyword?: string;
 }

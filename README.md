@@ -54,6 +54,11 @@
   - `UsersView` 已通过 `getUserList()` 获取用户列表，并使用 `UserInfo[]` 渲染用户表格
   - 用户列表已补齐加载中、错误重试、空数据和正常数据边界状态
   - Vite 已配置 `@` 指向 `src`，支持 `@/api/...`、`@/types/...` 路径别名
+- Day 9：完善列表分页类型和 mock 接口
+  - 已新增 `ListQuery`，统一列表查询参数
+  - 已新增客户、订单类型文件
+  - 用户、客户、订单列表接口已统一返回 `PageResult<T>`
+  - 用户列表页面已从 `res.data.list` 获取分页列表数据
 
 ## 目录结构
 
@@ -67,11 +72,15 @@
   - `modules/auth.ts`：认证相关接口
   - `modules/user.ts`：用户相关接口
   - `modules/menu.ts`：菜单相关接口
+  - `modules/customer.ts`：客户列表接口
+  - `modules/order.ts`：订单列表接口
 - src/utils：工具函数
 - src/types：类型定义
   - `common.ts`：通用类型、统一响应结构、分页类型
   - `user.ts`：用户、角色、登录相关类型
   - `menu.ts`：菜单、权限菜单相关类型
+  - `customer.ts`：客户列表相关类型
+  - `order.ts`：订单列表相关类型
 - src/styles：全局样式
 
 ## 当前路由

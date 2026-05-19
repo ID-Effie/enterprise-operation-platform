@@ -91,7 +91,7 @@ onMounted(async () => {
 });
 
 async function loadUserList() {
-  // 接口层返回 ApiResponse<UserInfo[]>，这里把 data 赋给页面状态。
+  // 接口层返回 ApiResponse<PageResult<UserInfo>>，这里把分页结果中的 list 赋给页面状态。
   try {
     loading.value = true;
     errorMessage.value = "";
@@ -99,9 +99,11 @@ async function loadUserList() {
     const params: UserListQuery = {
       username: query.username.trim() || undefined,
       status: query.status || undefined,
+      page: 1,
+      pageSize: 10,
     };
     const res = await getUserList(params);
-    users.value = res.data;
+    users.value = res.data.list;
   } catch (error: unknown) {
     users.value = [];
     errorMessage.value = getErrorMessage(error);

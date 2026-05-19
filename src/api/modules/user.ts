@@ -1,5 +1,5 @@
 import { request } from "../request";
-import type { ApiResponse } from "@/types/common";
+import type { ApiResponse, PageResult } from "@/types/common";
 import type { UserInfo, UserListQuery } from "@/types/user";
 
 export function getUserInfo(): Promise<ApiResponse<UserInfo>> {
@@ -17,12 +17,10 @@ export function getUserInfo(): Promise<ApiResponse<UserInfo>> {
 }
 
 export function getUserList(
-  params: UserListQuery = {},
-): Promise<ApiResponse<UserInfo[]>> {
-  return request<UserInfo[]>({
-    url: "/user/list",
-    data: params,
-    mockData: [
+  params: UserListQuery,
+): Promise<ApiResponse<PageResult<UserInfo>>> {
+  const mockData: PageResult<UserInfo> = {
+    list: [
       {
         id: 1,
         username: "admin",
@@ -40,5 +38,13 @@ export function getUserList(
         createdAt: "2026-05-18",
       },
     ],
+    total: 2,
+    page: params.page,
+    pageSize: params.pageSize,
+  };
+  return request<PageResult<UserInfo>>({
+    url: "/user/list",
+    data: params,
+    mockData,
   });
 }

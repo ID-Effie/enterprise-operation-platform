@@ -4,7 +4,7 @@
  * @Date: 2026-05-18 19:08:04
  */
 
-import type { ID } from "./common";
+import type { ID, ListQuery } from "./common";
 
 export type UserRole = "admin" | "manager" | "staff";
 
@@ -34,7 +34,7 @@ export interface LoginResult {
 }
 
 // UserListQuery 是用户列表查询参数，页面筛选区和接口层共用这一份类型。
-export interface UserListQuery {
+export interface UserListQuery extends ListQuery {
   username?: string;
   status?: UserStatus;
 }
