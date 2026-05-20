@@ -438,6 +438,31 @@ h2 {
   background: #fff0f0; /* 浅红色背景提示该账号不可用。 */
 }
 
+.status-pill--green {
+  color: #196b45;
+  background: #e9f7ef;
+}
+
+.status-pill--red {
+  color: #9f1d1d;
+  background: #fff0f0;
+}
+
+.status-pill--orange {
+  color: #9a5b00;
+  background: #fff7df;
+}
+
+.status-pill--blue {
+  color: #2454a6;
+  background: #edf4ff;
+}
+
+.status-pill--gray {
+  color: #52606d;
+  background: #f1f4f8;
+}
+
 .table-action {
   min-height: 32px; /* 表格内操作按钮比页面主按钮更紧凑。 */
   border: 1px solid #cbd4e1; /* 使用轻边框，避免表格操作过于抢眼。 */

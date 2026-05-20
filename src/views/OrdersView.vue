@@ -11,14 +11,31 @@
     <section class="query-panel" aria-label="订单查询区">
       <label>
         订单编号
-        <input type="text" placeholder="请输入订单编号" />
+        <input
+          v-model="query.orderNo"
+          type="text"
+          placeholder="请输入订单编号"
+        />
       </label>
       <label>
         订单状态
-        <input type="text" placeholder="全部状态" />
+        <select v-model="query.status">
+          <option value="">全部状态</option>
+          <option
+            v-for="option in orderStatusOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
       </label>
-      <button type="button" class="primary-link">查询</button>
-      <button type="button" class="secondary-link">重置</button>
+      <button type="button" class="primary-link" @click="loadOrderList">
+        查询
+      </button>
+      <button type="button" class="secondary-link" @click="resetQuery">
+        重置
+      </button>
     </section>
 
     <div class="table-toolbar">
@@ -31,13 +48,120 @@
         <span>订单编号</span>
         <span>客户名称</span>
         <span>订单状态</span>
+        <!-- <span>金额</span>
+        <span>创建时间</span> -->
         <span>操作</span>
       </div>
-      <p>订单列表数据将在后续接入接口后展示。</p>
+      <p v-if="loading" class="table-state">订单数据加载中...</p>
+      <div v-else-if="errorMessage" class="table-state table-error">
+        <span>{{ errorMessage }}</span>
+        <button type="button" class="table-action" @click="loadOrderList">
+          重试
+        </button>
+      </div>
+      <div v-else-if="orders.length > 0" class="table-body">
+        <div v-for="order in orders" :key="order.id" class="table-row">
+          <span>{{ order.orderNo }}</span>
+          <span>{{ order.customerName }}</span>
+          <span>
+            <!-- <span class="status-pill" :class="`status-pill--${order.status}`"> -->
+            <span
+              class="status-pill"
+              :class="formatOrderStatusColor(order.status)"
+            >
+              {{ formatOrderStatus(order.status) }}
+            </span>
+          </span>
+          <span>
+            <button type="button" class="table-action">编辑</button>
+          </span>
+        </div>
+      </div>
+      <p v-else class="table-state">暂无订单数据</p>
     </section>
   </PageContainer>
 </template>
 
 <script setup lang="ts">
 import PageContainer from "../components/PageContainer.vue";
+import { reactive, ref, onMounted } from "vue";
+import type { OrderInfo, OrderListQuery, OrderStatus } from "@/types/order";
+import { getOrderList } from "@/api/modules/order";
+import { orderStatusText, orderStatusColor } from "@/constants/status";
+
+const orders = ref<OrderInfo[]>([]);
+const loading = ref(false);
+const errorMessage = ref("");
+
+const query = reactive<{
+  orderNo: string;
+  status: "" | OrderStatus;
+}>({
+  orderNo: "",
+  status: "",
+});
+
+const orderStatusOptions: Array<{
+  label: string;
+  value: OrderStatus;
+}> = [
+  { label: orderStatusText.pending, value: "pending" },
+  { label: orderStatusText.processing, value: "processing" },
+  { label: orderStatusText.completed, value: "completed" },
+  { label: orderStatusText.cancelled, value: "cancelled" },
+];
+
+onMounted(async () => {
+  await loadOrderList();
+});
+
+async function loadOrderList() {
+  try {
+    loading.value = true;
+    errorMessage.value = "";
+    const params: OrderListQuery = {
+      orderNo: query.orderNo.trim() || undefined,
+      status: query.status || undefined,
+      page: 1,
+      pageSize: 10,
+    };
+
+    const res = await getOrderList(params);
+    orders.value = res.data.list;
+  } catch (error: unknown) {
+    orders.value = [];
+    errorMessage.value = getErrorMessage(error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+// Error 类型收窄
+function getErrorMessage(error: unknown) {
+  if (
+    typeof error === "object" &&
+    error != null &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+  return "订单列表加载失败，请稍后重试";
+}
+
+// 状态显示中文
+function formatOrderStatus(status: OrderInfo["status"]) {
+  return orderStatusText[status];
+}
+// 状态颜色显示
+function formatOrderStatusColor(status: OrderInfo["status"]) {
+  return `status-pill--${orderStatusColor[status]}`;
+}
+
+// 重置
+function resetQuery() {
+  query.orderNo = "";
+  query.status = "";
+  void loadOrderList();
+}
 </script>

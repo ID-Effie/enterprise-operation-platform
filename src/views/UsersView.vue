@@ -68,9 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import PageContainer from "../components/PageContainer.vue";
 import { reactive, ref, onMounted } from "vue";
+import PageContainer from "../components/PageContainer.vue";
 import { getUserList } from "@/api/modules/user";
+import { userStatusText } from "@/constants/status";
 import type { UserInfo, UserListQuery, UserStatus } from "@/types/user";
 
 const users = ref<UserInfo[]>([]);
@@ -78,6 +79,7 @@ const loading = ref(false);
 const errorMessage = ref("");
 
 // 查询表单使用页面状态承载，再转换成接口需要的 UserListQuery。
+// 筛选区的“全部状态”一般是空字符串，但接口参数里的状态应该是 UserStatus
 const query = reactive<{
   username: string;
   status: "" | UserStatus;
@@ -120,7 +122,7 @@ function resetQuery() {
 
 // 状态显示中文
 function formatUserStatus(status: UserInfo["status"]) {
-  return status === "enabled" ? "启用" : "禁用";
+  return userStatusText[status];
 }
 
 // 职责展示中文
