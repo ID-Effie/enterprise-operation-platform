@@ -38,3 +38,19 @@ export interface UserListQuery extends ListQuery {
   username?: string;
   status?: UserStatus;
 }
+
+// 删除用户参数类型
+export interface DeleteUserParams {
+  id: number;
+}
+
+//修改用户状态参数类型
+export interface UpdateUserStatusParams {
+  id: number;
+  status: UserStatus;
+}
+// 修改用户状态返回值类型
+export interface UpdateUserStatusResult extends UserInfo {
+  id: number;
+  success: boolean;
+}

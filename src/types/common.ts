@@ -14,8 +14,14 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+// 返回值报错 对象类型
+export interface ApiError {
+  code: number;
+  message: string;
+}
+
 // 只管分页
-export interface PageParams {
+interface PageParams {
   page: number;
   pageSize: number;
 }

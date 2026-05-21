@@ -12,7 +12,7 @@ export function getCustomerList(
 ): Promise<ApiResponse<PageResult<CustomerInfo>>> {
   return request<PageResult<CustomerInfo>>({
     url: "/customer/list",
-    data: params,
+    params,
     mockData: {
       list: [
         {

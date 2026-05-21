@@ -67,6 +67,15 @@
   - 订单列表页面已补齐加载中、错误重试、空数据和正常数据状态
   - 订单状态标签已通过 `Record<OrderStatus, string>` 映射中文文案和颜色语义
   - 用户状态文案已改为从统一状态映射中读取，减少页面内散乱判断
+- Day 11：Axios 响应类型与请求层建模
+  - 已优化 `src/api/request.ts`，使用 `AxiosRequestConfig` 扩展项目请求配置 `RequestConfig`
+  - 已补充 `ApiError`，用于描述统一请求层中的错误对象
+  - 已建立 `MockRequestConfig<T>`，让 `mockData`、`success`、`message`、`delay` 拥有明确类型
+  - `request<T>()` 统一返回 `Promise<ApiResponse<T>>`
+  - `auth.ts` 登录接口已区分 `LoginParams` 请求体和 `LoginResult` mock 响应结果
+  - `user.ts` 已补齐用户列表、删除用户、修改用户状态的接口类型
+  - `customer.ts` 客户列表接口已使用 `params` 表达查询参数，并返回 `PageResult<CustomerInfo>`
+  - 列表查询统一使用 `params`，登录和状态修改使用 `data` 表达请求体
 
 ## 目录结构
 
@@ -140,6 +149,9 @@
   - 布局路由和页面路由的基础关系
 - 请求层基础能力：
   - 统一响应结构 `ApiResponse<T>`
+  - 统一错误结构 `ApiError`
+  - 项目请求配置 `RequestConfig`
+  - mock 请求配置 `MockRequestConfig<T>`
   - mock 请求函数 `request<T>()`
   - 认证接口模块 `auth`
   - 用户接口模块 `user`
@@ -147,6 +159,10 @@
   - 登录参数类型 `LoginParams`
   - 登录结果类型 `LoginResult`
   - 用户信息类型 `UserInfo`
+  - 用户列表查询类型 `UserListQuery`
+  - 删除用户参数类型 `DeleteUserParams`
+  - 修改用户状态参数和结果类型 `UpdateUserStatusParams`、`UpdateUserStatusResult`
+  - 客户信息和客户列表查询类型 `CustomerInfo`、`CustomerListQuery`
   - 菜单项类型 `MenuItem`
 - 登录流程：
   - 登录页表单输入
@@ -242,6 +258,10 @@ pnpm build
 - 订单页面能按订单编号、订单状态筛选数据
 - 订单页面能展示加载中、错误重试和空数据状态
 - 订单状态和用户状态能通过统一状态映射展示中文文案和颜色标签
+- `request<T>()` 返回 `Promise<ApiResponse<T>>`
+- `auth.ts`、`user.ts`、`customer.ts` mock 接口有明确的入参和出参类型
+- 列表接口查询参数使用 `params`，登录和修改类接口请求体使用 `data`
+- mock 返回结果通过 `mockData` 提供，和请求参数分开
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 登录页不显示后台布局
 - 登录页输入 `admin` / `123456` 后能跳转 `/dashboard`
