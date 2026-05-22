@@ -53,9 +53,10 @@
           <span>{{ user.nickname ?? user.username }}</span>
           <span>{{ formatUserRole(user.role) }}</span>
           <span>
-            <span class="status-pill" :class="`status-pill--${user.status}`">
-              {{ formatUserStatus(user.status) }}
-            </span>
+            <StatusTag
+              :text="userStatusText[user.status]"
+              :color="userStatusColor[user.status]"
+            />
           </span>
           <span>
             <button type="button" class="table-action">编辑</button>
@@ -70,8 +71,9 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted } from "vue";
 import PageContainer from "../components/PageContainer.vue";
+import StatusTag from "@/components/StatusTag.vue";
 import { getUserList } from "@/api/modules/user";
-import { userStatusText } from "@/constants/status";
+import { userStatusText, userStatusColor } from "@/constants/status";
 import type { UserInfo, UserListQuery, UserStatus } from "@/types/user";
 
 const users = ref<UserInfo[]>([]);
@@ -118,11 +120,6 @@ function resetQuery() {
   query.username = "";
   query.status = "";
   void loadUserList();
-}
-
-// 状态显示中文
-function formatUserStatus(status: UserInfo["status"]) {
-  return userStatusText[status];
 }
 
 // 职责展示中文

@@ -19,8 +19,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+interface PageContainerProps {
   title: string;
   description?: string;
-}>();
+}
+defineProps<PageContainerProps>();
 </script>

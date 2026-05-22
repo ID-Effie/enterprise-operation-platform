@@ -64,13 +64,10 @@
           <span>{{ order.orderNo }}</span>
           <span>{{ order.customerName }}</span>
           <span>
-            <!-- <span class="status-pill" :class="`status-pill--${order.status}`"> -->
-            <span
-              class="status-pill"
-              :class="formatOrderStatusColor(order.status)"
-            >
-              {{ formatOrderStatus(order.status) }}
-            </span>
+            <StatusTag
+              :text="orderStatusText[order.status]"
+              :color="orderStatusColor[order.status]"
+            />
           </span>
           <span>
             <button type="button" class="table-action">编辑</button>
@@ -83,7 +80,8 @@
 </template>
 
 <script setup lang="ts">
-import PageContainer from "../components/PageContainer.vue";
+import PageContainer from "@/components/PageContainer.vue";
+import StatusTag from "@/components/StatusTag.vue";
 import { reactive, ref, onMounted } from "vue";
 import type { OrderInfo, OrderListQuery, OrderStatus } from "@/types/order";
 import { getOrderList } from "@/api/modules/order";
@@ -147,15 +145,6 @@ function getErrorMessage(error: unknown) {
     return error.message;
   }
   return "订单列表加载失败，请稍后重试";
-}
-
-// 状态显示中文
-function formatOrderStatus(status: OrderInfo["status"]) {
-  return orderStatusText[status];
-}
-// 状态颜色显示
-function formatOrderStatusColor(status: OrderInfo["status"]) {
-  return `status-pill--${orderStatusColor[status]}`;
 }
 
 // 重置
