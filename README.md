@@ -9,6 +9,7 @@
 - Vite
 - pnpm
 - Vue Router
+- Pinia
 
 ## 当前进度
 
@@ -76,14 +77,41 @@
   - `user.ts` 已补齐用户列表、删除用户、修改用户状态的接口类型
   - `customer.ts` 客户列表接口已使用 `params` 表达查询参数，并返回 `PageResult<CustomerInfo>`
   - 列表查询统一使用 `params`，登录和状态修改使用 `data` 表达请求体
+- Day 12：Vue 组件中的 TypeScript
+  - `PageContainer` 已使用 `PageContainerProps` 管理 `title`、`description` props 类型
+  - 已从 `BasicLayout` 中拆出 `AppSideMenu`，使用 `MenuItem[]` 管理菜单 props
+  - `AppSideMenu` 已使用 `defineEmits` 定义 `select` 事件，事件参数类型复用 `MenuItem["path"]`
+  - 已从 `BasicLayout` 中拆出顶部栏组件 `AppToBar`，使用 props 管理标题和用户名
+  - `AppToBar` 已使用 `defineEmits` 定义无参数 `logout` 事件
+  - 已抽取 `StatusTag` 状态标签组件，使用 `StatusColor` 收窄颜色类型
+  - 用户列表和订单列表已通过 `StatusTag` 展示状态文案和状态颜色
+  - 用户状态、订单状态已从页面数据流转到统一状态映射，再传入 `StatusTag`
+  - 主项目已通过 `vue-tsc` 类型检查
+- Day 13：Pinia、表单与表格类型实践
+  - 已安装 Pinia，并在 `main.ts` 中通过 `createPinia()` 注册全局 store
+  - 已新增 `src/stores/auth.ts`，集中管理登录状态和登录逻辑
+  - `AuthState` 已包含 `token`、`userInfo`、`roles`、`permissions`
+  - `auth store` 已提供 `isLogin`、`username` getters
+  - `auth store` 已提供 `login()`、`logout()` actions，并明确参数和返回值类型
+  - 登录页已改为调用 `authStore.login()`，不再直接在页面里调用登录接口和写入 token
+  - 用户列表已抽出 `UserQueryForm`，页面查询表单会转换成 `UserListQuery` 后再请求接口
+  - 客户列表已接入 `getCustomerList()`，使用 `CustomerInfo[]` 管理表格数据
+  - 客户列表已抽出 `CustomerQueryForm`，页面查询表单会转换成 `CustomerListQuery` 后再请求接口
+  - 客户列表已补齐加载中、错误重试、空数据和正常数据状态
+  - 主项目已进一步区分 store 状态、表单 model、表格 row 和接口 params 的类型边界
 
 ## 目录结构
 
 - src/views：页面组件
-- src/components：通用组件，例如 `PageContainer`
+- src/components：通用组件
+  - `PageContainer.vue`：业务页面容器
+  - `AppSideMenu.vue`：侧边栏菜单组件
+  - `AppToBar.vue`：顶部栏组件
+  - `StatusTag.vue`：状态标签组件
 - src/layouts：布局组件
 - src/router：路由配置
 - src/stores：状态管理
+  - `auth.ts`：登录状态 store，集中管理 token、用户信息、角色、权限和登录退出动作
 - src/api：接口请求
   - `request.ts`：统一请求入口和响应结构
   - `modules/auth.ts`：认证相关接口
@@ -135,6 +163,15 @@
   - 统一业务页面外层容器
   - 统一页面标题和描述展示
   - 通过 `slot` 承载页面自己的查询区、操作区和表格区
+  - `AppSideMenu`
+  - 使用 `MenuItem[]` 接收菜单数据
+  - 使用 `select` 事件向布局层回传菜单路径
+  - `AppToBar`
+  - 使用 `title`、`username` 管理顶部栏展示内容
+  - 使用 `logout` 事件通知布局层执行退出登录
+  - `StatusTag`
+  - 使用 `text` 展示状态文案
+  - 使用 `StatusColor` 限制状态颜色范围
 - 后台基础布局：
   - `BasicLayout`
   - 顶部栏
@@ -164,9 +201,16 @@
   - 修改用户状态参数和结果类型 `UpdateUserStatusParams`、`UpdateUserStatusResult`
   - 客户信息和客户列表查询类型 `CustomerInfo`、`CustomerListQuery`
   - 菜单项类型 `MenuItem`
+- 状态管理：
+  - Pinia 已接入主应用
+  - 登录状态 store `useAuthStore`
+  - 登录状态类型 `AuthState`
+  - 登录派生状态 `isLogin`、`username`
+  - 登录动作 `login(params: LoginParams): Promise<void>`
+  - 退出动作 `logout(): Promise<void>`
 - 登录流程：
   - 登录页表单输入
-  - 点击登录后调用 mock 登录接口
+  - 点击登录后调用 `authStore.login()`
   - 登录中禁用按钮
   - 登录失败展示错误信息
   - 登录成功保存 mock token
@@ -198,7 +242,6 @@
   - `RouteMeta`
   - 菜单权限和路由权限联动
 - 业务页面细化：
-  - 客户列表表格数据
   - 订单详情和订单处理动作
   - 系统设置表格数据
 - 工程能力：
@@ -207,8 +250,6 @@
   - 继续沉淀通用组件
   - 将 mock 请求替换为真实接口请求
 - 状态管理：
-  - 登录状态
-  - 用户信息
   - 菜单权限
 
 ## 启动方式
@@ -246,6 +287,12 @@ http://localhost:5173/
 pnpm build
 ```
 
+单独执行 Vue 类型检查：
+
+```bash
+pnpm exec vue-tsc -p tsconfig.app.json --noEmit
+```
+
 ## 当前验证重点
 
 - 首页能正常打开
@@ -253,11 +300,23 @@ pnpm build
 - 当前菜单有高亮状态
 - 客户、订单页面能展示统一的页面容器、查询区、操作按钮和表格占位区
 - 用户页面能通过 mock 用户接口展示用户名称、角色、账号状态和操作按钮
+- 用户列表查询表单使用 `UserQueryForm`，接口请求参数使用 `UserListQuery`
 - 用户页面能展示加载中、错误重试和空数据状态
+- 客户页面能通过 mock 客户接口展示客户名称、客户等级、联系人和行业
+- 客户列表查询表单使用 `CustomerQueryForm`，接口请求参数使用 `CustomerListQuery`
+- 客户页面能展示加载中、错误重试和空数据状态
 - 订单页面能通过 mock 订单接口展示订单编号、客户名称、订单状态和操作按钮
 - 订单页面能按订单编号、订单状态筛选数据
 - 订单页面能展示加载中、错误重试和空数据状态
 - 订单状态和用户状态能通过统一状态映射展示中文文案和颜色标签
+- `PageContainer`、`AppSideMenu`、`AppToBar`、`StatusTag` 的 props/emits 均有明确类型
+- `StatusTag` 的颜色类型使用 `StatusColor`，避免写成过宽的 `string`
+- 用户页和订单页能通过 `StatusTag` 复用状态标签展示
+- Pinia 已通过 `createPinia()` 接入主应用
+- `auth store` 的 `state`、`getters`、`actions` 均有明确类型
+- `auth store` 能统一管理 `token`、`userInfo`、`roles`、`permissions`
+- 登录页通过 `authStore.login()` 更新登录状态
+- `vue-tsc` 类型检查通过
 - `request<T>()` 返回 `Promise<ApiResponse<T>>`
 - `auth.ts`、`user.ts`、`customer.ts` mock 接口有明确的入参和出参类型
 - 列表接口查询参数使用 `params`，登录和修改类接口请求体使用 `data`

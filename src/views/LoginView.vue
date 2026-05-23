@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { login } from "../api/modules/auth";
+import { useAuthStore } from "@/stores/auth";
 
 const username = ref("");
 const password = ref("");
@@ -39,18 +39,18 @@ const loading = ref(false);
 const errorMessage = ref("");
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 async function handleLogin() {
   try {
     loading.value = true;
     errorMessage.value = "";
 
-    const res = await login({
+    // 这样登录状态就统一归 store 管，不散落在页面里
+    await authStore.login({
       username: username.value,
       password: password.value,
     });
-
-    localStorage.setItem("token", res.data.token);
 
     router.push("/");
   } catch {

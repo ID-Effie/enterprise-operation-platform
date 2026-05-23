@@ -82,10 +82,11 @@ const errorMessage = ref("");
 
 // 查询表单使用页面状态承载，再转换成接口需要的 UserListQuery。
 // 筛选区的“全部状态”一般是空字符串，但接口参数里的状态应该是 UserStatus
-const query = reactive<{
+interface UserQueryForm {
   username: string;
   status: "" | UserStatus;
-}>({
+}
+const query = reactive<UserQueryForm>({
   username: "",
   status: "",
 });
