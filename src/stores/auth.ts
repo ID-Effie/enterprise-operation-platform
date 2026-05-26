@@ -39,6 +39,7 @@ export const useAuthStore = defineStore("auth", {
     username: (state): string => state.userInfo?.username ?? "",
   },
 
+  // actions 用来写会修改状态的业务动作。
   actions: {
     async login(params: LoginParams): Promise<void> {
       // 1.调接口登录：
