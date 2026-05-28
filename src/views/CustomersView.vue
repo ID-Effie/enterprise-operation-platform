@@ -34,6 +34,8 @@
       </button>
     </section>
 
+    <p class="query-summary">{{ querySummary }}</p>
+
     <div class="table-toolbar">
       <button type="button" class="primary-link">新增客户</button>
       <button type="button" class="secondary-link">导出列表</button>
@@ -73,7 +75,7 @@ import type {
   CustomerListQuery,
 } from "@/types/customer";
 import PageContainer from "../components/PageContainer.vue";
-import { onMounted, reactive, ref } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import { getCustomerList } from "@/api/modules/customer";
 
 interface CustomerQueryForm {
@@ -88,14 +90,68 @@ const errorMessage = ref("");
 // reactive 是 Vue 3 里的一个 API，用来把普通对象变成“响应式对象”。
 // 用 reactive 包起来的对象，数据变了，页面会自动更新。
 // reactive 适合：对象类型的数据，比如表单、查询条件、配置对象。
+/** 以前：
+ * 输入框 / 下拉框
+    ↓ v-model
+query 查询状态
+    ↓ 点击查询
+CustomerListQuery 接口参数
+    ↓
+getCustomerList(params)
+    ↓
+customers 列表数据
+ */
+/**现在：
+ * v-model 修改 query
+    ↓
+computed 自动生成 querySummary
+    ↓
+watch 监听 query.keyword / query.level
+    ↓
+loadCustomerList 请求列表
+    ↓
+customers 更新表格
+ */
 const query = reactive<CustomerQueryForm>({
   keyword: "",
   level: "",
 });
+// 加客户等级文案映射
+const customerLevelText: Record<CustomerLevel, string> = {
+  vip: "VIP",
+  normal: "普通客户",
+  trial: "试用客户",
+};
 
-onMounted(async () => {
-  await loadCustomerList();
+// 加 computed 查询摘要
+const querySummary = computed(() => {
+  const conditions: string[] = [];
+
+  if (query.keyword.trim()) {
+    conditions.push(`客户名称：${query.keyword.trim()}`);
+  }
+
+  if (query.level) {
+    conditions.push(`客户等级：${customerLevelText[query.level]}`);
+  }
+
+  return conditions.length > 0 ? conditions.join("，") : "当前为全部客户";
 });
+
+/**
+ * 页面进入时立即请求一次
+ * query.keyword 变化时重新请求
+ * query.level 变化时重新请求
+ */
+watch(
+  () => [query.keyword, query.level],
+  () => {
+    void loadCustomerList();
+  },
+  {
+    immediate: true,
+  },
+);
 
 async function loadCustomerList() {
   try {
@@ -122,6 +178,6 @@ async function loadCustomerList() {
 function resetQuery() {
   query.keyword = "";
   query.level = "";
-  void loadCustomerList();
+  // void loadCustomerList();
 }
 </script>

@@ -99,6 +99,24 @@
   - 客户列表已抽出 `CustomerQueryForm`，页面查询表单会转换成 `CustomerListQuery` 后再请求接口
   - 客户列表已补齐加载中、错误重试、空数据和正常数据状态
   - 主项目已进一步区分 store 状态、表单 model、表格 row 和接口 params 的类型边界
+- Day 15：统一基础页面为 `script setup + TS`
+  - 已检查登录页、布局页、客户页、订单页、用户页、系统页均使用 `<script setup lang="ts">`
+  - 已将系统管理页统一为 `PageContainer` 页面结构
+  - 系统管理页已新增 `SystemConfigType`、`SystemConfigQueryForm`、`SystemConfigInfo` 类型
+  - 系统管理页使用 `reactive<SystemConfigQueryForm>` 管理查询表单
+  - 系统管理页使用 `ref<SystemConfigInfo[]>` 管理配置列表
+  - 系统管理页已支持按配置名称和配置类型筛选 mock 数据
+  - 系统管理页已支持重置查询条件并恢复配置列表
+  - 主项目基础业务页进一步统一为“页面容器 + 查询区 + 操作区 + 表格区”的结构
+- Day 16：客户/订单查询状态与响应式副作用
+  - 客户列表页面已使用 `reactive<CustomerQueryForm>` 管理客户名称和客户等级查询条件
+  - 客户列表页面已使用 `computed` 生成 `querySummary`，用于展示当前筛选摘要
+  - 客户列表页面已使用 `watch` 监听 `query.keyword`、`query.level`，并在查询条件变化时重新请求客户列表
+  - 订单列表页面已使用 `reactive` 管理订单编号和订单状态查询条件
+  - 订单列表页面已使用 `computed` 生成订单筛选摘要
+  - 订单列表页面已使用 `watch` 监听 `query.orderNo`、`query.status`，并在查询条件变化时重新请求订单列表
+  - 客户/订单页面的初始化请求已统一交给 `watch(..., { immediate: true })` 触发
+  - 查询条件变化、筛选摘要更新、列表请求刷新之间的数据流已和 `computed` / `watch` 职责对应起来
 
 ## 目录结构
 
@@ -154,9 +172,16 @@
   - `LoginView`
   - `DashboardView`
   - `CustomersView`
+    - 客户查询状态使用 `CustomerQueryForm`
+    - 客户查询摘要使用 `computed querySummary`
+    - 客户查询条件变化后通过 `watch` 触发列表请求
   - `OrdersView`
+    - 订单查询状态包含订单编号和订单状态
+    - 订单查询摘要使用 `computed querySummary`
+    - 订单查询条件变化后通过 `watch` 触发列表请求
   - `UsersView`
   - `SystemView`
+  - 系统管理页已统一使用 `PageContainer`，并接入 typed 查询状态和 mock 配置列表
   - `NotFoundView`
 - 通用组件：
   - `PageContainer`
@@ -243,7 +268,7 @@
   - 菜单权限和路由权限联动
 - 业务页面细化：
   - 订单详情和订单处理动作
-  - 系统设置表格数据
+  - 系统设置真实接口数据和编辑动作
 - 工程能力：
   - 路由拆分
   - 类型定义整理
@@ -277,7 +302,7 @@ http://localhost:5173/
 ```
 
 4. 点击登录，登录成功后进入首页 `/dashboard`。
-5. 点击侧边栏菜单，依次验证客户管理、订单管理、用户管理页面可以正常切换。
+5. 点击侧边栏菜单，依次验证客户管理、订单管理、用户管理、系统管理页面可以正常切换。
 6. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
 7. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
 
@@ -304,10 +329,19 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - 用户页面能展示加载中、错误重试和空数据状态
 - 客户页面能通过 mock 客户接口展示客户名称、客户等级、联系人和行业
 - 客户列表查询表单使用 `CustomerQueryForm`，接口请求参数使用 `CustomerListQuery`
+- 客户页面能通过 `computed querySummary` 展示当前筛选摘要
+- 客户页面能通过 `watch` 监听客户名称和客户等级变化，并自动刷新列表
 - 客户页面能展示加载中、错误重试和空数据状态
 - 订单页面能通过 mock 订单接口展示订单编号、客户名称、订单状态和操作按钮
 - 订单页面能按订单编号、订单状态筛选数据
+- 订单页面能通过 `computed querySummary` 展示当前筛选摘要
+- 订单页面能通过 `watch` 监听订单编号和订单状态变化，并自动刷新列表
 - 订单页面能展示加载中、错误重试和空数据状态
+- 系统管理页使用 `PageContainer`，页面结构和客户、订单、用户页面保持一致
+- 系统管理页查询表单使用 `SystemConfigQueryForm`
+- 系统管理页列表数据使用 `SystemConfigInfo[]`
+- 系统管理页能按配置名称和配置类型筛选配置列表
+- 系统管理页点击重置后能恢复全部 mock 配置数据
 - 订单状态和用户状态能通过统一状态映射展示中文文案和颜色标签
 - `PageContainer`、`AppSideMenu`、`AppToBar`、`StatusTag` 的 props/emits 均有明确类型
 - `StatusTag` 的颜色类型使用 `StatusColor`，避免写成过宽的 `string`
@@ -320,6 +354,7 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - `request<T>()` 返回 `Promise<ApiResponse<T>>`
 - `auth.ts`、`user.ts`、`customer.ts` mock 接口有明确的入参和出参类型
 - 列表接口查询参数使用 `params`，登录和修改类接口请求体使用 `data`
+- 客户/订单列表能区分查询状态、筛选摘要和请求副作用：`reactive` 管理条件，`computed` 生成摘要，`watch` 触发请求
 - mock 返回结果通过 `mockData` 提供，和请求参数分开
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 登录页不显示后台布局

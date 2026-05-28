@@ -38,6 +38,8 @@
       </button>
     </section>
 
+    <p class="query-summary">{{ querySummary }}</p>
+
     <div class="table-toolbar">
       <button type="button" class="primary-link">创建订单</button>
       <button type="button" class="secondary-link">批量处理</button>
@@ -82,7 +84,7 @@
 <script setup lang="ts">
 import PageContainer from "@/components/PageContainer.vue";
 import StatusTag from "@/components/StatusTag.vue";
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import type { OrderInfo, OrderListQuery, OrderStatus } from "@/types/order";
 import { getOrderList } from "@/api/modules/order";
 import { orderStatusText, orderStatusColor } from "@/constants/status";
@@ -90,14 +92,6 @@ import { orderStatusText, orderStatusColor } from "@/constants/status";
 const orders = ref<OrderInfo[]>([]);
 const loading = ref(false);
 const errorMessage = ref("");
-
-const query = reactive<{
-  orderNo: string;
-  status: "" | OrderStatus;
-}>({
-  orderNo: "",
-  status: "",
-});
 
 const orderStatusOptions: Array<{
   label: string;
@@ -109,9 +103,37 @@ const orderStatusOptions: Array<{
   { label: orderStatusText.cancelled, value: "cancelled" },
 ];
 
-onMounted(async () => {
-  await loadOrderList();
+const query = reactive<{
+  orderNo: string;
+  status: "" | OrderStatus;
+}>({
+  orderNo: "",
+  status: "",
 });
+
+const querySummary = computed(() => {
+  const conditions: string[] = [];
+
+  if (query.orderNo.trim()) {
+    conditions.push(`订单编号：${query.orderNo.trim()}`);
+  }
+
+  if (query.status) {
+    conditions.push(`订单状态：${orderStatusText[query.status]}`);
+  }
+
+  return conditions.length > 0 ? conditions.join("，") : "当前为全部订单";
+});
+
+watch(
+  () => [query.orderNo, query.status],
+  () => {
+    void loadOrderList();
+  },
+  {
+    immediate: true,
+  },
+);
 
 async function loadOrderList() {
   try {
@@ -151,6 +173,6 @@ function getErrorMessage(error: unknown) {
 function resetQuery() {
   query.orderNo = "";
   query.status = "";
-  void loadOrderList();
+  // void loadOrderList();
 }
 </script>
