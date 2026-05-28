@@ -1,5 +1,6 @@
 <!--
  * @Description: 菜单组件
+  AppSideMenu 只负责渲染菜单列表
  * @Author: zhaoyang.sun@proinnova.com.cn
  * @Date: 2026-05-22 16:18:36
 -->

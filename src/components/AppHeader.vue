@@ -1,5 +1,6 @@
 <!--
  * @Description: 顶部栏组件
+  AppHeader 只展示顶部栏，通过 emit 通知退出登录
  * @Author: zhaoyang.sun@proinnova.com.cn
  * @Date: 2026-05-22 16:28:04
 -->

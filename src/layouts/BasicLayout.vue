@@ -1,28 +1,35 @@
+<!--
+ * BasicLayout 只保留这些职责：BasicLayout 管理布局状态和业务动作。
+      请求菜单数据
+      计算当前标题
+      处理退出登录
+      处理菜单选择事件
+      组合布局组件
+ * BasicLayout.vue 管理布局状态和业务动作。
+      ├─ AppSidebar.vue   接收菜单数据和当前路径，负责展示侧边栏。
+      │  └─ AppSideMenu.vue  只负责渲染菜单列表。
+      ├─ AppHeader.vue   只展示顶部栏，通过 emit 通知退出登录。
+      └─ AppMain.vue  只负责页面内容容器。
+        └─ RouterView
+-->
+
 <template>
   <div class="app-layout">
     <!-- 侧边栏 -->
-    <aside class="app-sidebar">
-      <div class="brand">
-        <span class="brand-mark">EP</span>
-        <div>
-          <strong>运营平台</strong>
-          <small>Enterprise Console</small>
-        </div>
-      </div>
-      <AppSideMenu
-        :menus="menus"
-        :active-path="route.path"
-        @select="handleMenuSelect"
-      />
-    </aside>
+    <AppSidebar
+      :menus="menus"
+      :active-path="route.path"
+      @select="handleMenuSelect"
+    />
 
     <section class="app-shell">
       <!-- 顶部栏 -->
-      <AppToBar :title="currentTitle" username="管理员" @logout="logOut" />
+      <AppHeader :title="currentTitle" username="管理员" @logout="logOut" />
+
       <!-- 内容区 Main =>当前路由页面 -->
-      <main class="app-content">
+      <AppMain>
         <RouterView />
-      </main>
+      </AppMain>
     </section>
   </div>
 </template>
@@ -32,8 +39,9 @@ import { computed, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getUserMenus } from "@/api/modules/menu";
 import type { MenuItem } from "@/types/menu";
-import AppSideMenu from "@/components/AppSideMenu.vue";
-import AppToBar from "@/components/AppToBar.vue";
+import AppSidebar from "@/components/AppSidebar.vue";
+import AppHeader from "@/components/AppHeader.vue";
+import AppMain from "@/components/AppMain.vue";
 
 // 菜单 path 要和路由 path 对上,否则点击菜单会进入 404 或空页面。
 
