@@ -3,6 +3,11 @@
     title="用户管理"
     description="用于承载后台用户、角色归属和账号状态维护。"
   >
+    <template #actions>
+      <button type="button" class="primary-link">新增用户</button>
+      <button type="button" class="secondary-link">分配角色</button>
+    </template>
+
     <section class="query-panel" aria-label="用户查询区">
       <label>
         用户名称
@@ -27,11 +32,6 @@
         重置
       </button>
     </section>
-
-    <div class="table-toolbar">
-      <button type="button" class="primary-link">新增用户</button>
-      <button type="button" class="secondary-link">分配角色</button>
-    </div>
 
     <section class="table-placeholder" aria-label="用户表格区">
       <div class="table-header">

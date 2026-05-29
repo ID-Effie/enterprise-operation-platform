@@ -8,6 +8,11 @@
     title="客户列表"
     description="用于承载客户基础信息、客户分层和客户详情入口。"
   >
+    <template #actions>
+      <button type="button" class="primary-link">新增客户</button>
+      <button type="button" class="secondary-link">导出列表</button>
+    </template>
+
     <section class="query-panel" aria-label="客户查询区">
       <label>
         客户名称
@@ -35,11 +40,6 @@
     </section>
 
     <p class="query-summary">{{ querySummary }}</p>
-
-    <div class="table-toolbar">
-      <button type="button" class="primary-link">新增客户</button>
-      <button type="button" class="secondary-link">导出列表</button>
-    </div>
 
     <section class="table-placeholder" aria-label="客户表格区">
       <div class="table-header">

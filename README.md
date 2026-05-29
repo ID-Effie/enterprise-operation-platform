@@ -117,6 +117,25 @@
   - 订单列表页面已使用 `watch` 监听 `query.orderNo`、`query.status`，并在查询条件变化时重新请求订单列表
   - 客户/订单页面的初始化请求已统一交给 `watch(..., { immediate: true })` 触发
   - 查询条件变化、筛选摘要更新、列表请求刷新之间的数据流已和 `computed` / `watch` 职责对应起来
+- Day 17：Vue 生命周期与组件通信
+  - 已将布局组件拆分为 `AppSidebar`、`AppHeader`、`AppMain`
+  - `BasicLayout` 只保留请求菜单数据、计算当前标题、处理退出登录、处理菜单选择事件和组合布局组件的职责
+  - `AppSidebar` 接收 `menus`、`activePath` props，负责侧边栏品牌区和菜单区展示
+  - `AppSidebar` 通过 `select(path)` 事件向上转发菜单选择结果
+  - `AppSideMenu` 继续只负责菜单列表渲染，并通过 `emit("select", item.path)` 通知点击菜单
+  - `AppHeader` 接收 `title`、`username` props，并通过无参数 `logout` 事件通知父组件退出
+  - `AppMain` 通过默认插槽承载 `RouterView`，只负责页面内容容器
+  - 已检查布局组件 `props / emits` 能独立说明数据流：数据由 `BasicLayout` 向下传递，菜单选择和退出登录事件由子组件向上传递
+- Day 18：插槽与业务组件封装
+  - `PageContainer` 已从单纯的 `title`、`description` props 展示，增强为支持标题区、操作区和默认内容区的业务页面容器
+  - `PageContainer` 已新增 `title` 具名插槽，支持父组件自定义标题区；未传插槽时继续使用 `title`、`description` 作为默认内容
+  - `PageContainer` 已新增 `actions` 具名插槽，用于承载页面级操作按钮
+  - 默认插槽继续承载页面主体内容，例如查询区、筛选摘要、表格区、加载中、错误重试和空数据状态
+  - 客户页面已通过 `actions` 插槽放置“新增客户”“导出列表”按钮
+  - 订单页面已通过 `actions` 插槽放置“创建订单”“批量处理”按钮
+  - 用户页面已通过 `actions` 插槽放置“新增用户”“分配角色”按钮
+  - 已通过客户、订单、用户三个页面验证 `PageContainer` 当前插槽设计足够覆盖常见后台列表页
+  - 已记录插槽暴露过多会导致组件职责模糊、使用成本变高、父组件依赖内部结构、页面风格不统一等维护问题
 
 ## 目录结构
 
@@ -186,8 +205,9 @@
 - 通用组件：
   - `PageContainer`
   - 统一业务页面外层容器
-  - 统一页面标题和描述展示
-  - 通过 `slot` 承载页面自己的查询区、操作区和表格区
+  - 通过 `title` 插槽支持自定义标题区，并保留 `title`、`description` 默认内容
+  - 通过 `actions` 插槽承载客户、订单、用户等页面的顶部操作按钮
+  - 通过默认插槽承载页面自己的查询区、筛选摘要、表格区和状态提示
   - `AppSideMenu`
   - 使用 `MenuItem[]` 接收菜单数据
   - 使用 `select` 事件向布局层回传菜单路径

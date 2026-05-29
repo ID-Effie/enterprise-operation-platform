@@ -314,8 +314,22 @@ h2 {
   gap: 20px; /* 各业务区块之间保持统一间距，避免页面内容挤在一起。 */
 }
 
+.page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .page-heading h2 {
   margin-bottom: 8px; /* 页面标题和描述文字之间保持较小间距。 */
+}
+
+.page-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .query-panel {
