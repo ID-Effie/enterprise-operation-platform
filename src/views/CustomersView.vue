@@ -65,26 +65,58 @@
       </div>
       <p v-else class="table-state">暂无客户数据</p>
     </section>
+    <div class="pagination-bar">
+      <button
+        type="button"
+        class="secondary-link"
+        :disabled="currentPage <= 1"
+        @click="
+          setPage(currentPage - 1);
+          loadCustomerList();
+        "
+      >
+        上一页
+      </button>
+
+      <span>第 {{ currentPage }} / {{ totalPages }} 页，共 {{ total }} 条</span>
+
+      <button
+        type="button"
+        class="secondary-link"
+        :disabled="currentPage >= totalPages"
+        @click="
+          setPage(currentPage + 1);
+          loadCustomerList();
+        "
+      >
+        下一页
+      </button>
+    </div>
   </PageContainer>
 </template>
 
 <script setup lang="ts">
+import { reactive, ref, computed, watch } from "vue";
 import type {
   CustomerInfo,
   CustomerLevel,
   CustomerListQuery,
 } from "@/types/customer";
 import PageContainer from "../components/PageContainer.vue";
-import { reactive, ref, computed, watch } from "vue";
 import { getCustomerList } from "@/api/modules/customer";
+import { useLoading } from "@/composables/useLoading";
+import { usePagination } from "@/composables/usePagination";
 
 interface CustomerQueryForm {
   keyword: string;
   level: "" | CustomerLevel;
 }
 
+const { loading, start, stop } = useLoading();
+const { currentPage, pageSize, total, totalPages, setPage, setTotal, reset } =
+  usePagination(1, 10);
+
 const customers = ref<CustomerInfo[]>([]);
-const loading = ref(false);
 const errorMessage = ref("");
 
 // reactive 是 Vue 3 里的一个 API，用来把普通对象变成“响应式对象”。
@@ -155,29 +187,31 @@ watch(
 
 async function loadCustomerList() {
   try {
-    loading.value = true;
+    start();
     errorMessage.value = "";
 
     const params: CustomerListQuery = {
       keyword: query.keyword.trim() || undefined,
       level: query.level || undefined,
-      page: 1,
-      pageSize: 10,
+      page: currentPage.value,
+      pageSize: pageSize.value,
     };
 
     const res = await getCustomerList(params);
     customers.value = res.data.list;
+    setTotal(res.data.total);
   } catch {
     customers.value = [];
     errorMessage.value = "客户列表加载失败，请稍后重试";
   } finally {
-    loading.value = false;
+    stop();
   }
 }
 
 function resetQuery() {
   query.keyword = "";
   query.level = "";
+  reset();
   // void loadCustomerList();
 }
 </script>

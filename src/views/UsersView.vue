@@ -4,7 +4,9 @@
     description="用于承载后台用户、角色归属和账号状态维护。"
   >
     <template #actions>
-      <button type="button" class="primary-link">新增用户</button>
+      <button type="button" class="primary-link" @click="openCreate">
+        新增用户
+      </button>
       <button type="button" class="secondary-link">分配角色</button>
     </template>
 
@@ -59,12 +61,57 @@
             />
           </span>
           <span>
-            <button type="button" class="table-action">编辑</button>
+            <button type="button" class="table-action" @click="openEdit(user)">
+              编辑
+            </button>
           </span>
         </div>
       </div>
       <p v-else class="table-state">暂无用户数据</p>
     </section>
+
+    <div class="pagination-bar">
+      <button
+        type="button"
+        class="secondary-link"
+        :disabled="currentPage <= 1"
+        @click="
+          setPage(currentPage - 1);
+          loadUserList();
+        "
+      >
+        上一页
+      </button>
+
+      <span>第 {{ currentPage }} / {{ totalPages }} 页，共 {{ total }} 条</span>
+
+      <button
+        type="button"
+        class="secondary-link"
+        :disabled="currentPage >= totalPages"
+        @click="
+          setPage(currentPage + 1);
+          loadUserList();
+        "
+      >
+        下一页
+      </button>
+    </div>
+
+    <div v-if="visible" class="modal-mask">
+      <div class="modal-panel">
+        <h3>{{ mode === "create" ? "新增用户" : "编辑用户" }}</h3>
+
+        <p v-if="current">
+          当前用户：{{ current.nickname ?? current.username }}
+        </p>
+        <p v-else>当前为新增用户</p>
+
+        <button type="button" class="secondary-link" @click="close">
+          关闭
+        </button>
+      </div>
+    </div>
   </PageContainer>
 </template>
 
@@ -75,10 +122,18 @@ import StatusTag from "@/components/StatusTag.vue";
 import { getUserList } from "@/api/modules/user";
 import { userStatusText, userStatusColor } from "@/constants/status";
 import type { UserInfo, UserListQuery, UserStatus } from "@/types/user";
+import { useModal } from "@/composables/useModal";
+import { useLoading } from "@/composables/useLoading";
+import { usePagination } from "@/composables/usePagination";
 
 const users = ref<UserInfo[]>([]);
-const loading = ref(false);
 const errorMessage = ref("");
+
+const { visible, mode, current, openCreate, openEdit, close } =
+  useModal<UserInfo>();
+const { currentPage, pageSize, total, totalPages, setPage, setTotal, reset } =
+  usePagination(1, 10);
+const { loading, start, stop } = useLoading();
 
 // 查询表单使用页面状态承载，再转换成接口需要的 UserListQuery。
 // 筛选区的“全部状态”一般是空字符串，但接口参数里的状态应该是 UserStatus
@@ -98,28 +153,30 @@ onMounted(async () => {
 async function loadUserList() {
   // 接口层返回 ApiResponse<PageResult<UserInfo>>，这里把分页结果中的 list 赋给页面状态。
   try {
-    loading.value = true;
+    start();
     errorMessage.value = "";
 
     const params: UserListQuery = {
       username: query.username.trim() || undefined,
       status: query.status || undefined,
-      page: 1,
-      pageSize: 10,
+      page: currentPage.value,
+      pageSize: pageSize.value,
     };
     const res = await getUserList(params);
     users.value = res.data.list;
+    setTotal(res.data.total);
   } catch (error: unknown) {
     users.value = [];
     errorMessage.value = getErrorMessage(error);
   } finally {
-    loading.value = false;
+    stop();
   }
 }
 
 function resetQuery() {
   query.username = "";
   query.status = "";
+  reset();
   void loadUserList();
 }
 

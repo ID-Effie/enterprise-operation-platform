@@ -126,16 +126,27 @@
   - `AppHeader` 接收 `title`、`username` props，并通过无参数 `logout` 事件通知父组件退出
   - `AppMain` 通过默认插槽承载 `RouterView`，只负责页面内容容器
   - 已检查布局组件 `props / emits` 能独立说明数据流：数据由 `BasicLayout` 向下传递，菜单选择和退出登录事件由子组件向上传递
-- Day 18：插槽与业务组件封装
-  - `PageContainer` 已从单纯的 `title`、`description` props 展示，增强为支持标题区、操作区和默认内容区的业务页面容器
+	- Day 18：插槽与业务组件封装
+	  - `PageContainer` 已从单纯的 `title`、`description` props 展示，增强为支持标题区、操作区和默认内容区的业务页面容器
   - `PageContainer` 已新增 `title` 具名插槽，支持父组件自定义标题区；未传插槽时继续使用 `title`、`description` 作为默认内容
   - `PageContainer` 已新增 `actions` 具名插槽，用于承载页面级操作按钮
   - 默认插槽继续承载页面主体内容，例如查询区、筛选摘要、表格区、加载中、错误重试和空数据状态
   - 客户页面已通过 `actions` 插槽放置“新增客户”“导出列表”按钮
   - 订单页面已通过 `actions` 插槽放置“创建订单”“批量处理”按钮
-  - 用户页面已通过 `actions` 插槽放置“新增用户”“分配角色”按钮
-  - 已通过客户、订单、用户三个页面验证 `PageContainer` 当前插槽设计足够覆盖常见后台列表页
-  - 已记录插槽暴露过多会导致组件职责模糊、使用成本变高、父组件依赖内部结构、页面风格不统一等维护问题
+	  - 用户页面已通过 `actions` 插槽放置“新增用户”“分配角色”按钮
+	  - 已通过客户、订单、用户三个页面验证 `PageContainer` 当前插槽设计足够覆盖常见后台列表页
+	  - 已记录插槽暴露过多会导致组件职责模糊、使用成本变高、父组件依赖内部结构、页面风格不统一等维护问题
+	- Day 19：组合式函数 composable 接入
+	  - 已新增 `src/composables/usePagination.ts`，统一管理列表分页状态和分页方法
+	  - 已新增 `src/composables/useModal.ts`，统一管理新增/编辑弹窗的打开、关闭、模式和当前数据
+	  - 已新增 `src/composables/useLoading.ts`，统一管理请求 loading 状态
+	  - 客户列表已接入 `usePagination` 和 `useLoading`，请求参数使用 `currentPage.value`、`pageSize.value`
+	  - 用户管理已接入 `usePagination`、`useModal`、`useLoading`，新增和编辑按钮可打开对应弹窗
+	  - 订单列表已接入 `usePagination`、`useModal`、`useLoading`，创建和编辑按钮可打开对应弹窗
+	  - 列表请求成功后统一通过 `setTotal(res.data.total)` 更新分页总数
+	  - 查询重置时会调用 `reset()` 恢复分页状态
+	  - 已通过客户、用户、订单列表验证 composable 返回值稳定性
+	  - 主项目已通过 `pnpm build`
 
 ## 目录结构
 
@@ -149,6 +160,10 @@
 - src/router：路由配置
 - src/stores：状态管理
   - `auth.ts`：登录状态 store，集中管理 token、用户信息、角色、权限和登录退出动作
+- src/composables：组合式函数
+  - `usePagination.ts`：列表分页状态、总数、总页数和分页方法
+  - `useModal.ts`：新增/编辑弹窗状态、模式和当前行数据
+  - `useLoading.ts`：请求 loading 状态和切换方法
 - src/api：接口请求
   - `request.ts`：统一请求入口和响应结构
   - `modules/auth.ts`：认证相关接口
@@ -194,11 +209,19 @@
     - 客户查询状态使用 `CustomerQueryForm`
     - 客户查询摘要使用 `computed querySummary`
     - 客户查询条件变化后通过 `watch` 触发列表请求
+    - 客户列表分页状态使用 `usePagination`
+    - 客户列表加载状态使用 `useLoading`
   - `OrdersView`
     - 订单查询状态包含订单编号和订单状态
     - 订单查询摘要使用 `computed querySummary`
     - 订单查询条件变化后通过 `watch` 触发列表请求
+    - 订单列表分页状态使用 `usePagination`
+    - 订单列表加载状态使用 `useLoading`
+    - 订单创建/编辑弹窗状态使用 `useModal`
   - `UsersView`
+    - 用户列表分页状态使用 `usePagination`
+    - 用户列表加载状态使用 `useLoading`
+    - 用户新增/编辑弹窗状态使用 `useModal`
   - `SystemView`
   - 系统管理页已统一使用 `PageContainer`，并接入 typed 查询状态和 mock 配置列表
   - `NotFoundView`
@@ -253,6 +276,15 @@
   - 登录派生状态 `isLogin`、`username`
   - 登录动作 `login(params: LoginParams): Promise<void>`
   - 退出动作 `logout(): Promise<void>`
+- 组合式函数：
+  - `usePagination`
+  - 返回 `currentPage`、`pageSize`、`total`、`totalPages`
+  - 返回 `setPage`、`setPageSize`、`setTotal`、`reset`
+  - `useModal`
+  - 返回 `visible`、`mode`、`current`
+  - 返回 `openCreate`、`openEdit`、`close`
+  - `useLoading`
+  - 返回 `loading`、`start`、`stop`、`toggle`
 - 登录流程：
   - 登录页表单输入
   - 点击登录后调用 `authStore.login()`
@@ -323,8 +355,11 @@ http://localhost:5173/
 
 4. 点击登录，登录成功后进入首页 `/dashboard`。
 5. 点击侧边栏菜单，依次验证客户管理、订单管理、用户管理、系统管理页面可以正常切换。
-6. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
-7. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
+6. 在客户列表验证加载态、分页展示和查询重置。
+7. 在用户管理点击“新增用户”和“编辑”，确认弹窗可以打开和关闭。
+8. 在订单列表点击“创建订单”和“编辑”，确认弹窗可以打开并展示当前订单。
+9. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
+10. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
 
 ## 构建检查
 
@@ -375,6 +410,12 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - `auth.ts`、`user.ts`、`customer.ts` mock 接口有明确的入参和出参类型
 - 列表接口查询参数使用 `params`，登录和修改类接口请求体使用 `data`
 - 客户/订单列表能区分查询状态、筛选摘要和请求副作用：`reactive` 管理条件，`computed` 生成摘要，`watch` 触发请求
+- 客户、用户、订单列表的分页状态来自 `usePagination`
+- 客户、用户、订单列表的请求 loading 状态来自 `useLoading`
+- 用户、订单页面的新增/编辑弹窗状态来自 `useModal`
+- 列表请求参数使用 `currentPage.value`、`pageSize.value`，不再在页面中固定写死 `page: 1`、`pageSize: 10`
+- 列表请求成功后通过 `setTotal(res.data.total)` 更新总数和总页数
+- 查询重置时通过 `reset()` 恢复分页状态
 - mock 返回结果通过 `mockData` 提供，和请求参数分开
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 登录页不显示后台布局

@@ -9,7 +9,9 @@
     description="用于承载订单状态、订单金额和订单处理动作。"
   >
     <template #actions>
-      <button type="button" class="primary-link">创建订单</button>
+      <button type="button" class="primary-link" @click="openCreate">
+        创建订单
+      </button>
       <button type="button" class="secondary-link">批量处理</button>
     </template>
 
@@ -72,12 +74,57 @@
             />
           </span>
           <span>
-            <button type="button" class="table-action">编辑</button>
+            <button type="button" class="table-action" @click="openEdit(order)">
+              编辑
+            </button>
           </span>
         </div>
       </div>
       <p v-else class="table-state">暂无订单数据</p>
     </section>
+
+    <div class="pagination-bar">
+      <button
+        type="button"
+        class="secondary-link"
+        :disabled="currentPage <= 1"
+        @click="
+          setPage(currentPage - 1);
+          loadOrderList();
+        "
+      >
+        上一页
+      </button>
+
+      <span>第 {{ currentPage }} / {{ totalPages }} 页，共 {{ total }} 条</span>
+
+      <button
+        type="button"
+        class="secondary-link"
+        :disabled="currentPage >= totalPages"
+        @click="
+          setPage(currentPage + 1);
+          loadOrderList();
+        "
+      >
+        下一页
+      </button>
+    </div>
+
+    <div v-if="visible" class="modal-mask">
+      <div class="modal-panel">
+        <h3>{{ mode === "create" ? "新增订单" : "编辑订单" }}</h3>
+
+        <p v-if="current">
+          当前订单：{{ current.orderNo }} - {{ current.customerName }}
+        </p>
+        <p v-else>当前为新增订单</p>
+
+        <button type="button" class="secondary-link" @click="close">
+          关闭
+        </button>
+      </div>
+    </div>
   </PageContainer>
 </template>
 
@@ -88,10 +135,18 @@ import { reactive, ref, computed, watch } from "vue";
 import type { OrderInfo, OrderListQuery, OrderStatus } from "@/types/order";
 import { getOrderList } from "@/api/modules/order";
 import { orderStatusText, orderStatusColor } from "@/constants/status";
+import { useModal } from "@/composables/useModal";
+import { useLoading } from "@/composables/useLoading";
+import { usePagination } from "@/composables/usePagination";
 
 const orders = ref<OrderInfo[]>([]);
-const loading = ref(false);
 const errorMessage = ref("");
+
+const { visible, mode, current, openCreate, openEdit, close } =
+  useModal<OrderInfo>();
+const { currentPage, pageSize, total, totalPages, setPage, setTotal, reset } =
+  usePagination(1, 10);
+const { loading, start, stop } = useLoading();
 
 const orderStatusOptions: Array<{
   label: string;
@@ -137,22 +192,23 @@ watch(
 
 async function loadOrderList() {
   try {
-    loading.value = true;
+    start();
     errorMessage.value = "";
     const params: OrderListQuery = {
       orderNo: query.orderNo.trim() || undefined,
       status: query.status || undefined,
-      page: 1,
-      pageSize: 10,
+      page: currentPage.value,
+      pageSize: pageSize.value,
     };
 
     const res = await getOrderList(params);
     orders.value = res.data.list;
+    setTotal(res.data.total);
   } catch (error: unknown) {
     orders.value = [];
     errorMessage.value = getErrorMessage(error);
   } finally {
-    loading.value = false;
+    stop();
   }
 }
 
@@ -173,6 +229,7 @@ function getErrorMessage(error: unknown) {
 function resetQuery() {
   query.orderNo = "";
   query.status = "";
+  reset();
   // void loadOrderList();
 }
 </script>
