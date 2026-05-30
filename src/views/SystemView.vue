@@ -8,6 +8,13 @@
     title="系统管理"
     description="用于承载菜单配置、系统参数和平台基础设置。"
   >
+    <template #actions>
+      <button type="button" class="primary-link" v-permission="'role:create'">
+        新增配置
+      </button>
+      <button type="button" class="secondary-link">刷新缓存</button>
+    </template>
+
     <section class="query-panel" aria-label="系统配置查询区">
       <label>
         配置名称
@@ -34,11 +41,6 @@
       </button>
     </section>
 
-    <div class="table-toolbar">
-      <button type="button" class="primary-link">新增配置</button>
-      <button type="button" class="secondary-link">刷新缓存</button>
-    </div>
-
     <section class="table-placeholder" aria-label="系统配置表格区">
       <div class="table-header">
         <span>配置名称</span>
@@ -52,7 +54,13 @@
           <span>{{ configTypeText[config.type] }}</span>
           <span>{{ config.updatedAt }}</span>
           <span>
-            <button type="button" class="table-action">编辑</button>
+            <button
+              type="button"
+              class="table-action"
+              v-permission="'role:update'"
+            >
+              编辑
+            </button>
           </span>
         </div>
       </div>

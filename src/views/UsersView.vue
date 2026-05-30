@@ -4,10 +4,21 @@
     description="用于承载后台用户、角色归属和账号状态维护。"
   >
     <template #actions>
-      <button type="button" class="primary-link" @click="openCreate">
+      <button
+        type="button"
+        class="primary-link"
+        @click="openCreate"
+        v-permission="'user:create'"
+      >
         新增用户
       </button>
-      <button type="button" class="secondary-link">分配角色</button>
+      <button
+        type="button"
+        class="secondary-link"
+        v-permission="'user:assign-role'"
+      >
+        分配角色
+      </button>
     </template>
 
     <section class="query-panel" aria-label="用户查询区">
@@ -61,7 +72,12 @@
             />
           </span>
           <span>
-            <button type="button" class="table-action" @click="openEdit(user)">
+            <button
+              v-permission="'user:update'"
+              type="button"
+              class="table-action"
+              @click="openEdit(user)"
+            >
               编辑
             </button>
           </span>
@@ -70,6 +86,7 @@
       <p v-else class="table-state">暂无用户数据</p>
     </section>
 
+    <!-- 分页区 -->
     <div class="pagination-bar">
       <button
         type="button"
@@ -98,6 +115,7 @@
       </button>
     </div>
 
+    <!-- modal框 -->
     <div v-if="visible" class="modal-mask">
       <div class="modal-panel">
         <h3>{{ mode === "create" ? "新增用户" : "编辑用户" }}</h3>

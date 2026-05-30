@@ -52,7 +52,13 @@ export const useAuthStore = defineStore("auth", {
       // 但计划要求 store 里有 roles，所以这里先把单个角色包装成数组
       // 以后如果后端返回 roles: UserRole[]，这里再改就行。
       this.roles = [res.data.userInfo.role];
-      this.permissions = [];
+      this.permissions = [
+        "user:create",
+        "user:update",
+        "user:assign-role",
+        "role:create",
+        "role:update",
+      ];
 
       // 把 token 存进 localStorage，方便刷新后恢复：
       localStorage.setItem("token", res.data.token);

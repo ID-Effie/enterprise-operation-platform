@@ -147,6 +147,17 @@
 	  - 查询重置时会调用 `reset()` 恢复分页状态
 	  - 已通过客户、用户、订单列表验证 composable 返回值稳定性
 	  - 主项目已通过 `pnpm build`
+	- Day 20：自定义指令与按钮权限接入
+	  - 已新增 `src/directives/permission.ts`，实现全局权限指令 `v-permission`
+	  - 已新增 `src/directives/index.ts`，统一注册项目自定义指令
+	  - `main.ts` 已在 Pinia 和 Router 注册后调用 `setupDirectives(app)`
+	  - `auth store` 已在登录成功后模拟当前用户权限列表 `permissions`
+	  - 用户管理页已在“新增用户”“分配角色”“编辑”按钮上应用 `v-permission`
+	  - 系统管理页已在“新增配置”和表格“编辑”按钮上应用 `v-permission`
+	  - 权限指令支持单个权限字符串和权限数组，内部统一转换为 `string[]` 后使用 `some` 判断
+	  - 无权限按钮通过 `display: none` 隐藏，有权限按钮保持原有样式展示
+	  - 已验证 `role:create` 无权限时“新增配置”隐藏，未加权限控制的“刷新缓存”仍正常展示
+	  - 已记录前端按钮权限只控制展示，不能替代后端接口鉴权
 
 ## 目录结构
 
@@ -164,6 +175,9 @@
   - `usePagination.ts`：列表分页状态、总数、总页数和分页方法
   - `useModal.ts`：新增/编辑弹窗状态、模式和当前行数据
   - `useLoading.ts`：请求 loading 状态和切换方法
+- src/directives：自定义指令
+  - `permission.ts`：按钮权限指令 `v-permission`
+  - `index.ts`：统一注册项目自定义指令
 - src/api：接口请求
   - `request.ts`：统一请求入口和响应结构
   - `modules/auth.ts`：认证相关接口
@@ -222,8 +236,10 @@
     - 用户列表分页状态使用 `usePagination`
     - 用户列表加载状态使用 `useLoading`
     - 用户新增/编辑弹窗状态使用 `useModal`
+    - 新增用户、分配角色、编辑按钮接入 `v-permission`
   - `SystemView`
   - 系统管理页已统一使用 `PageContainer`，并接入 typed 查询状态和 mock 配置列表
+  - 系统管理页新增配置、表格编辑按钮接入 `v-permission`
   - `NotFoundView`
 - 通用组件：
   - `PageContainer`
@@ -285,6 +301,12 @@
   - 返回 `openCreate`、`openEdit`、`close`
   - `useLoading`
   - 返回 `loading`、`start`、`stop`、`toggle`
+- 自定义指令：
+  - `v-permission`
+  - 从 `authStore.permissions` 读取当前用户权限列表
+  - 支持 `v-permission="'user:create'"` 单权限写法
+  - 支持 `v-permission="['user:create', 'admin']"` 多权限写法
+  - 使用 `display: none` 控制无权限按钮展示
 - 登录流程：
   - 登录页表单输入
   - 点击登录后调用 `authStore.login()`
@@ -358,8 +380,10 @@ http://localhost:5173/
 6. 在客户列表验证加载态、分页展示和查询重置。
 7. 在用户管理点击“新增用户”和“编辑”，确认弹窗可以打开和关闭。
 8. 在订单列表点击“创建订单”和“编辑”，确认弹窗可以打开并展示当前订单。
-9. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
-10. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
+9. 在用户管理确认“分配角色”按钮因缺少 `user:assign-role` 权限而隐藏。
+10. 在系统管理确认“新增配置”因缺少 `role:create` 权限而隐藏，“刷新缓存”仍正常显示。
+11. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
+12. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
 
 ## 构建检查
 
@@ -416,6 +440,11 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - 列表请求参数使用 `currentPage.value`、`pageSize.value`，不再在页面中固定写死 `page: 1`、`pageSize: 10`
 - 列表请求成功后通过 `setTotal(res.data.total)` 更新总数和总页数
 - 查询重置时通过 `reset()` 恢复分页状态
+- `v-permission` 已通过 `setupDirectives(app)` 注册为全局指令
+- `v-permission` 从 `authStore.permissions` 判断当前用户是否拥有按钮权限
+- 用户管理页中 `user:create`、`user:update` 对应按钮显示，`user:assign-role` 对应按钮隐藏
+- 系统管理页中 `role:create` 对应按钮隐藏，未加权限控制的“刷新缓存”按钮正常显示
+- 权限指令只控制前端按钮展示，不能替代后端接口鉴权
 - mock 返回结果通过 `mockData` 提供，和请求参数分开
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 登录页不显示后台布局
