@@ -1,5 +1,6 @@
 /*
  * @Description: 建立统一状态映射文件
+constants 一般用来放项目里的固定枚举值、状态码、选项列表、业务常量。
  * @Author: zhaoyang.sun@proinnova.com.cn
  * @Date: 2026-05-20 15:57:13
  */

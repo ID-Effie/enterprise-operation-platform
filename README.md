@@ -158,6 +158,15 @@
 	  - 无权限按钮通过 `display: none` 隐藏，有权限按钮保持原有样式展示
 	  - 已验证 `role:create` 无权限时“新增配置”隐藏，未加权限控制的“刷新缓存”仍正常展示
 	  - 已记录前端按钮权限只控制展示，不能替代后端接口鉴权
+- Day 22：项目骨架、Vite 配置与路径别名复盘
+  - 已复盘中后台项目按职责拆目录的原因和目录边界
+  - 已确认主项目具备 `api`、`assets`、`components`、`composables`、`constants`、`directives`、`layouts`、`router`、`stores`、`styles`、`types`、`utils`、`views` 基础目录
+  - 已确认 `vite.config.ts` 中通过 `resolve.alias` 配置 `@` 指向 `src`
+  - 已确认 `tsconfig.app.json` 中通过 `paths` 配置 `@/*` 指向 `./src/*`
+  - 已明确 TypeScript 6 下不再依赖 `baseUrl`，路径映射目标使用 `./src/*`
+  - 已梳理 `constants`、`types`、`utils` 的职责区别
+  - 已输出项目目录设计文档：`docs/project-directory-design-v1.md`
+  - 已沉淀 Day 22 学习笔记：`notes/day22-vite-project-structure-env-alias-notes.md`
 
 ## 目录结构
 
@@ -196,6 +205,27 @@
   - `order.ts`：订单列表相关类型
   - `approval.ts`：审批状态和审批信息相关类型
 - src/styles：全局样式
+
+## 工程配置
+
+- `vite.config.ts`
+  - 使用 `@vitejs/plugin-vue` 接入 Vue。
+  - 通过 `resolve.alias` 将 `@` 指向 `src`。
+  - 开发服务器固定使用 `5173` 端口，并自动打开浏览器。
+- `tsconfig.app.json`
+  - 开启 `strict`。
+  - 通过 `paths` 配置 `@/*` 到 `./src/*`。
+  - 使用 `types: ["vite/client"]` 让 TypeScript 识别 Vite 的 `import.meta.env` 类型。
+
+当前路径别名写法：
+
+```json
+"paths": {
+  "@/*": ["./src/*"]
+}
+```
+
+注意：TypeScript 6 下 `baseUrl` 已弃用，当前项目不再依赖 `baseUrl` 配置。
 
 ## 当前路由
 

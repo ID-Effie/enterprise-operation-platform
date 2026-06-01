@@ -2,11 +2,11 @@
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
     "strict": true, // 是否开启严格模式。学习阶段建议开启，这样 TS 才能真正帮你发现问题。
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
+    // "ignoreDeprecations": "6.0",
+    // "baseUrl": ".",
     "paths": {
       //是否配置了 @ 指向 src, import type { UserInfo } from '@/types/user'
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "types": ["vite/client"],
