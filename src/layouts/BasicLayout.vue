@@ -24,7 +24,11 @@
 
     <section class="app-shell">
       <!-- 顶部栏 -->
-      <AppHeader :title="currentTitle" username="管理员" @logout="logOut" />
+      <AppHeader
+        :title="currentTitle"
+        :username="userStore.username"
+        @logout="logOut"
+      />
 
       <!-- 内容区 Main =>当前路由页面 -->
       <AppMain>
@@ -42,12 +46,16 @@ import type { MenuItem } from "@/types/menu";
 import AppSidebar from "@/components/AppSidebar.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import AppMain from "@/components/AppMain.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 
 // 菜单 path 要和路由 path 对上,否则点击菜单会进入 404 或空页面。
 
 const route = useRoute(); // 获取当前路由信息。只能读
 const router = useRouter(); // 路由实例，可以跳转
 const menus = ref<MenuItem[]>([]);
+const authStore = useAuthStore();
+const userStore = useUserStore();
 
 onMounted(async () => {
   const res = await getUserMenus();
@@ -60,8 +68,8 @@ const currentTitle = computed(() => {
   return activeMenu?.title ?? "运营平台";
 });
 
-function logOut() {
-  localStorage.removeItem("token");
+async function logOut() {
+  await authStore.logout();
   router.push("/login");
 }
 

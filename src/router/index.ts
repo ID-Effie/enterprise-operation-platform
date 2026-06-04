@@ -8,6 +8,8 @@ import CustomersView from "../views/CustomersView.vue";
 import OrdersView from "../views/OrdersView.vue";
 import SystemView from "../views/SystemView.vue";
 import UsersView from "../views/UsersView.vue";
+import { useAuthStore } from "@/stores/auth";
+import { usePermissionStore } from "@/stores/permission";
 
 //createWebHistory() 表示使用正常 URL 模式（/dashboard）而不是 hash 模式（/#/dashboard）
 const router = createRouter({
@@ -114,22 +116,16 @@ const router = createRouter({
 // beforeEach 是 Vue Router 的全局前置守卫
 // 每次路由跳转之前，都会先执行这里的逻辑。
 // 登录权限判断、页面标题设置、角色权限判断
-router.beforeEach((to) => {
-  const token = localStorage.getItem("token");
-  const permissions = [
-    "dashboard:view",
-    "customer:list",
-    "order:list",
-    "user:list",
-    "system:manage",
-  ];
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore();
+  const permissionStore = usePermissionStore();
 
   // 已登录(有token)时访问登录页，自动去首页
-  if (to.path === "/login" && token) {
+  if (to.path === "/login" && authStore.isLogin) {
     return "/dashboard";
   }
 
-  if (to.meta.requiresAuth && !token) {
+  if (to.meta.requiresAuth && !authStore.isLogin) {
     return {
       path: "/login",
       query: {
@@ -138,9 +134,22 @@ router.beforeEach((to) => {
     };
   }
 
+  /**
+   * localStorage 里有 token
+      -> authStore.isLogin 为 true
+      -> permissionStore.permissions 为空
+      -> 调 authStore.restoreSession()
+      -> mock 填回 userInfo 和 permissions
+      -> 再判断当前路由权限
+      -> 正常进入页面
+   */
+  if (authStore.isLogin && permissionStore.permissions.length === 0) {
+    await authStore.restoreSession();
+  }
+
   if (
     to.meta.permission &&
-    !permissions.includes(to.meta.permission as string)
+    !permissionStore.hasPermissions(to.meta.permission as string)
   ) {
     return "/403";
   }

@@ -167,6 +167,18 @@
   - 已梳理 `constants`、`types`、`utils` 的职责区别
   - 已输出项目目录设计文档：`docs/project-directory-design-v1.md`
   - 已沉淀 Day 22 学习笔记：`notes/day22-vite-project-structure-env-alias-notes.md`
+- Day 23：Router 与路由元信息整理
+  - 已整理主项目路由模块，明确登录路由、基础布局路由、业务模块路由和异常页路由
+  - `/login` 作为独立登录页，不进入后台布局
+  - `/` 作为 `BasicLayout` 父级布局路由，重定向到 `/dashboard`
+  - `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 已作为 `BasicLayout` 的子路由直接渲染业务页面
+  - 已移除业务页面下多余的空 `children`，避免重复嵌套和 Vue Router warning
+  - 后台页面已补齐 `meta.title`、`meta.requiresAuth`、`meta.permission`
+  - 全局路由守卫已支持未登录跳 `/login`、已登录访问 `/login` 跳 `/dashboard`、无权限跳 `/403`
+  - 已新增并验证 `/403` 无权限页，`/:pathMatch(.*)*` 继续作为 404 兜底
+  - 已验证未登录访问 `/dashboard` 会跳 `/login?redirect=/dashboard`
+  - 已验证访问不存在路径会进入 404 页面
+  - 已沉淀 Day 23 学习笔记：`notes/day23-vue-router-meta-guards-notes.md`
 
 ## 目录结构
 
@@ -236,9 +248,26 @@
 - `/orders`：订单管理页
 - `/users`：用户管理页
 - `/system`：系统管理页
+- `/403`：无权限页面
 - `/:pathMatch(.*)*`：404 页面
 
-其中 `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 会进入 `BasicLayout`，在布局的内容区中展示对应页面。
+其中 `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 是 `BasicLayout` 的子路由，会在布局的内容区中展示对应页面。
+
+当前后台路由统一使用 `meta` 描述页面业务属性：
+
+```ts
+meta: {
+  title: "用户管理页",
+  requiresAuth: true,
+  permission: "user:list",
+}
+```
+
+`meta` 字段含义：
+
+- `title`：页面标题 / 菜单标题 / 浏览器标题
+- `requiresAuth`：是否需要登录
+- `permission`：访问页面需要的权限标识
 
 ## 当前已完成模块
 
@@ -298,6 +327,11 @@
   - `RouterView` 页面出口
   - `RouterLink` 页面跳转
   - 布局路由和页面路由的基础关系
+  - 登录路由、布局路由、业务路由和异常页路由拆分
+  - `meta.title`、`meta.requiresAuth`、`meta.permission` 路由元信息
+  - 全局前置守卫 `beforeEach`
+  - 403 无权限页
+  - 404 通配路由兜底
 - 请求层基础能力：
   - 统一响应结构 `ApiResponse<T>`
   - 统一错误结构 `ApiError`
@@ -368,7 +402,8 @@
 ## 后续模块计划
 
 - 路由与菜单继续整理：
-  - `RouteMeta`
+  - 抽出 `RouteMeta` 类型声明
+  - 将路由权限从本地模拟数组迁移到权限 store
   - 菜单权限和路由权限联动
 - 业务页面细化：
   - 订单详情和订单处理动作
@@ -412,8 +447,9 @@ http://localhost:5173/
 8. 在订单列表点击“创建订单”和“编辑”，确认弹窗可以打开并展示当前订单。
 9. 在用户管理确认“分配角色”按钮因缺少 `user:assign-role` 权限而隐藏。
 10. 在系统管理确认“新增配置”因缺少 `role:create` 权限而隐藏，“刷新缓存”仍正常显示。
-11. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
-12. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
+11. 访问 `/users`，因为当前路由权限数组中注释了 `user:list`，确认进入 403 页面。
+12. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
+13. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
 
 ## 构建检查
 
@@ -483,5 +519,10 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - 登录过程中按钮进入禁用状态
 - 未登录访问 `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 会跳转登录页
 - 登录成功后浏览器 `localStorage` 中会写入 `token`
+- 已登录访问 `/login` 会自动跳转 `/dashboard`
+- 后台业务路由均作为 `BasicLayout` 的子路由展示，不再重复嵌套空子路由
+- 后台业务路由均具备 `title`、`requiresAuth`、`permission`
+- 缺少页面权限时会跳转 `/403`
 - 点击退出登录后会清理 `token` 并返回登录页
+- `/403` 页面显示无权限提示
 - 不存在的路径能进入 404 页面
