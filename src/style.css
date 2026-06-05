@@ -7,8 +7,7 @@
 
 body {
   margin: 0; /* 去掉浏览器默认外边距，否则页面四周会有白边。 */
-  font-family:
-    Arial, Helvetica, sans-serif; /* 默认字体依次往下找，前面的字体不可用就用后面的。 */
+  font-family: Arial, Helvetica, sans-serif; /* 默认字体依次往下找，前面的字体不可用就用后面的。 */
   color: #172033; /* 设置全站默认文字颜色，子元素默认会继承这个颜色。 */
   background: #f5f7fb; /* 设置全站背景色，让页面不是纯白。 */
 }
@@ -137,10 +136,7 @@ h2 {
   display: grid; /* 后台主布局使用 grid，方便分成左侧菜单和右侧内容两列。 */
   grid-template-columns:
     240px
-    minmax(
-      0,
-      1fr
-    ); /* 左侧固定 240px，右侧占满剩余空间；minmax(0, 1fr) 避免内容把右侧列撑爆。 */
+    minmax(0, 1fr); /* 左侧固定 240px，右侧占满剩余空间；minmax(0, 1fr) 避免内容把右侧列撑爆。 */
   min-height: 100vh; /* 布局高度至少等于一屏，让侧边栏能从顶部延伸到底部。 */
 }
 
@@ -512,10 +508,7 @@ h2 {
   }
 
   .side-menu {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    ); /* 小屏菜单改成两列，减少纵向占用空间。 */
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 小屏菜单改成两列，减少纵向占用空间。 */
   }
 
   .app-header {

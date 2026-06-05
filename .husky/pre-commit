@@ -1,0 +1,2 @@
+# 提交前只检查本次 git add 的文件，失败时会阻止提交。
+pnpm exec lint-staged

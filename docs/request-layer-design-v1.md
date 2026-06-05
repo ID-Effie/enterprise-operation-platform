@@ -52,16 +52,16 @@ src/
 
 职责说明：
 
-| 文件 | 职责 |
-| --- | --- |
-| `src/api/request.ts` | 创建 Axios 实例、注册拦截器、导出统一 `request<T>()` |
-| `src/api/mockAdapter.ts` | 开发阶段用 Axios adapter 模拟后端响应 |
-| `src/api/modules/auth.ts` | 登录、退出、请求层验证接口 |
-| `src/api/modules/user.ts` | 用户信息、用户列表、删除用户、修改状态接口 |
-| `src/api/modules/customer.ts` | 客户列表接口 |
-| `src/api/modules/order.ts` | 订单列表接口 |
-| `src/api/modules/menu.ts` | 菜单接口 |
-| `src/types/common.ts` | `ApiResponse<T>`、`ApiError`、分页等通用类型 |
+| 文件                          | 职责                                                 |
+| ----------------------------- | ---------------------------------------------------- |
+| `src/api/request.ts`          | 创建 Axios 实例、注册拦截器、导出统一 `request<T>()` |
+| `src/api/mockAdapter.ts`      | 开发阶段用 Axios adapter 模拟后端响应                |
+| `src/api/modules/auth.ts`     | 登录、退出、请求层验证接口                           |
+| `src/api/modules/user.ts`     | 用户信息、用户列表、删除用户、修改状态接口           |
+| `src/api/modules/customer.ts` | 客户列表接口                                         |
+| `src/api/modules/order.ts`    | 订单列表接口                                         |
+| `src/api/modules/menu.ts`     | 菜单接口                                             |
+| `src/types/common.ts`         | `ApiResponse<T>`、`ApiError`、分页等通用类型         |
 
 ## 三、统一响应结构
 
@@ -69,19 +69,19 @@ src/
 
 ```ts
 export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
+  code: number
+  message: string
+  data: T
 }
 ```
 
 含义：
 
-| 字段 | 含义 |
-| --- | --- |
-| `code` | 业务状态码，`0` 表示业务成功 |
-| `message` | 后端返回的提示信息 |
-| `data` | 当前接口真正的业务数据 |
+| 字段      | 含义                         |
+| --------- | ---------------------------- |
+| `code`    | 业务状态码，`0` 表示业务成功 |
+| `message` | 后端返回的提示信息           |
+| `data`    | 当前接口真正的业务数据       |
 
 例子：
 
@@ -100,8 +100,8 @@ ApiResponse<null>
 
 ```ts
 export interface RequestConfig extends AxiosRequestConfig {
-  showLoading?: boolean;
-  showError?: boolean;
+  showLoading?: boolean
+  showError?: boolean
 }
 ```
 
@@ -129,9 +129,9 @@ RequestConfig 不再包含 mockData、success、delay。
 
 ```ts
 const service = axios.create({
-  baseURL: "/api",
-  timeout: 10000,
-});
+  baseURL: '/api',
+  timeout: 10000
+})
 ```
 
 设计理由：
@@ -156,14 +156,14 @@ const service = axios.create({
 
 ```ts
 service.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token')
 
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
 
-  return config;
-});
+  return config
+})
 ```
 
 处理流程：
@@ -197,15 +197,15 @@ HTTP 失败响应分支
 
 ```ts
 service.interceptors.response.use((response) => {
-  const res = response.data as ApiResponse<unknown>;
+  const res = response.data as ApiResponse<unknown>
 
   if (res.code !== 0) {
-    console.error(res.message || "业务错误");
-    return Promise.reject(res);
+    console.error(res.message || '业务错误')
+    return Promise.reject(res)
   }
 
-  return response;
-});
+  return response
+})
 ```
 
 处理的是业务错误。
@@ -234,27 +234,25 @@ HTTP status = 200
 当前逻辑：
 
 ```ts
-const status = error.response?.status;
+const status = error.response?.status
 
 if (status === 401) {
-  localStorage.removeItem("token");
-  window.location.href = `/login?redirect=${encodeURIComponent(
-    window.location.pathname,
-  )}`;
+  localStorage.removeItem('token')
+  window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
 } else if (status === 500) {
-  console.error("服务器错误");
+  console.error('服务器错误')
 } else {
-  console.error("网络错误或请求失败");
+  console.error('网络错误或请求失败')
 }
 ```
 
 处理策略：
 
-| 状态 | 含义 | 当前处理 |
-| --- | --- | --- |
-| `401` | 未登录或登录过期 | 清理 token，并跳转登录页 |
-| `500` | 服务器错误 | 打印服务器错误 |
-| 无响应 / 其他 | 网络错误或请求失败 | 打印网络错误 |
+| 状态          | 含义               | 当前处理                 |
+| ------------- | ------------------ | ------------------------ |
+| `401`         | 未登录或登录过期   | 清理 token，并跳转登录页 |
+| `500`         | 服务器错误         | 打印服务器错误           |
+| 无响应 / 其他 | 网络错误或请求失败 | 打印网络错误             |
 
 后续可以扩展：
 
@@ -269,9 +267,7 @@ if (status === 401) {
 
 ```ts
 export function request<T>(config: RequestConfig): Promise<ApiResponse<T>> {
-  return service
-    .request<ApiResponse<T>>(config)
-    .then((response) => response.data);
+  return service.request<ApiResponse<T>>(config).then((response) => response.data)
 }
 ```
 
@@ -307,29 +303,25 @@ src/api/mockAdapter.ts
 核心能力：
 
 ```ts
-export function createMockAdapter<TData>(
-  status: number,
-  data: TData,
-  delay = 300,
-): AxiosAdapter
+export function createMockAdapter<TData>(status: number, data: TData, delay = 300): AxiosAdapter
 ```
 
 使用方式：
 
 ```ts
 return request<LoginResult>({
-  url: "/auth/login",
-  method: "POST",
+  url: '/auth/login',
+  method: 'POST',
   data: params,
   adapter: createMockAdapter(200, {
     code: 0,
-    message: "登录成功",
+    message: '登录成功',
     data: {
-      token: "mock-token-001",
-      userInfo: {},
-    },
-  }),
-});
+      token: 'mock-token-001',
+      userInfo: {}
+    }
+  })
+})
 ```
 
 adapter mock 的价值：
@@ -353,18 +345,16 @@ src/api/modules/*
 示例：
 
 ```ts
-export function getUserList(
-  params: UserListQuery,
-): Promise<ApiResponse<PageResult<UserInfo>>> {
+export function getUserList(params: UserListQuery): Promise<ApiResponse<PageResult<UserInfo>>> {
   return request<PageResult<UserInfo>>({
-    url: "/user/list",
+    url: '/user/list',
     params,
     adapter: createMockAdapter(200, {
       code: 0,
-      message: "请求成功",
-      data: userListResult,
-    }),
-  });
+      message: '请求成功',
+      data: userListResult
+    })
+  })
 }
 ```
 
@@ -401,17 +391,17 @@ export function getUserList(
 
 ```ts
 try {
-  start();
-  errorMessage.value = "";
+  start()
+  errorMessage.value = ''
 
-  const res = await getUserList(params);
-  users.value = res.data.list;
-  setTotal(res.data.total);
+  const res = await getUserList(params)
+  users.value = res.data.list
+  setTotal(res.data.total)
 } catch (error) {
-  users.value = [];
-  errorMessage.value = getErrorMessage(error);
+  users.value = []
+  errorMessage.value = getErrorMessage(error)
 } finally {
-  stop();
+  stop()
 }
 ```
 
@@ -421,12 +411,12 @@ try {
 
 当前错误处理分层：
 
-| 层级 | 负责内容 |
-| --- | --- |
-| `request.ts` | token、业务错误、401、500、网络错误 |
-| `api/modules/*` | 描述业务接口、入参、出参 |
-| `stores/*` | 登录、退出、恢复会话等业务动作 |
-| `views/*` | loading、空状态、页面错误文案、表格状态 |
+| 层级            | 负责内容                                |
+| --------------- | --------------------------------------- |
+| `request.ts`    | token、业务错误、401、500、网络错误     |
+| `api/modules/*` | 描述业务接口、入参、出参                |
+| `stores/*`      | 登录、退出、恢复会话等业务动作          |
+| `views/*`       | loading、空状态、页面错误文案、表格状态 |
 
 当前策略：
 
@@ -439,12 +429,12 @@ try {
 
 已验证分支：
 
-| 分支 | mock 方式 | 结果 |
-| --- | --- | --- |
-| 200 成功 | `status = 200`，`code = 0` | 返回业务数据 |
-| 业务错误 | `status = 200`，`code = 10001` | 响应拦截器 reject |
-| 500 | `status = 500` | 进入服务器错误分支 |
-| 401 | `status = 401` | 清 token，并跳转登录页 |
+| 分支     | mock 方式                      | 结果                   |
+| -------- | ------------------------------ | ---------------------- |
+| 200 成功 | `status = 200`，`code = 0`     | 返回业务数据           |
+| 业务错误 | `status = 200`，`code = 10001` | 响应拦截器 reject      |
+| 500      | `status = 500`                 | 进入服务器错误分支     |
+| 401      | `status = 401`                 | 清 token，并跳转登录页 |
 
 已执行构建：
 
@@ -486,10 +476,10 @@ adapter: createMockAdapter(...)
 
 ```ts
 return request<LoginResult>({
-  url: "/auth/login",
-  method: "POST",
-  data: params,
-});
+  url: '/auth/login',
+  method: 'POST',
+  data: params
+})
 ```
 
 页面和 store 调用方式不需要变化。
@@ -499,7 +489,7 @@ return request<LoginResult>({
 后续可以把 `baseURL` 改成：
 
 ```ts
-baseURL: import.meta.env.VITE_API_BASE_URL;
+baseURL: import.meta.env.VITE_API_BASE_URL
 ```
 
 并通过 `.env.development`、`.env.production` 管理不同环境接口地址。
@@ -524,9 +514,9 @@ ElMessage.error(...)
 
 ```ts
 request({
-  url: "/user/list",
-  showLoading: true,
-});
+  url: '/user/list',
+  showLoading: true
+})
 ```
 
 再由请求层或统一请求状态管理处理全局 loading。

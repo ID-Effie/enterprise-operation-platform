@@ -4,27 +4,27 @@
  * @Date: 2026-05-29 17:08:14
  */
 // 只负责 loading 状态切换
-import { ref } from "vue";
+import { ref } from 'vue'
 
 export function useLoading() {
-  const loading = ref(false);
+  const loading = ref(false)
 
   const start = () => {
-    loading.value = true;
-  };
+    loading.value = true
+  }
 
   const stop = () => {
-    loading.value = false;
-  };
+    loading.value = false
+  }
 
   const toggle = () => {
-    loading.value = !loading.value;
-  };
+    loading.value = !loading.value
+  }
 
   return {
     loading,
     start,
     stop,
-    toggle,
-  };
+    toggle
+  }
 }

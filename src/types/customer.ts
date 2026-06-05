@@ -4,19 +4,19 @@
  * @Date: 2026-05-19 14:37:04
  */
 
-import type { ID, ListQuery } from "./common";
+import type { ID, ListQuery } from './common'
 
-export type CustomerLevel = "vip" | "normal" | "trial";
+export type CustomerLevel = 'vip' | 'normal' | 'trial'
 
 export interface CustomerInfo {
-  id: ID;
-  name: string;
-  level: CustomerLevel;
-  phone: string;
-  industry: string;
-  createdAt: string;
+  id: ID
+  name: string
+  level: CustomerLevel
+  phone: string
+  industry: string
+  createdAt: string
 }
 
 export interface CustomerListQuery extends ListQuery {
-  level?: CustomerLevel;
+  level?: CustomerLevel
 }

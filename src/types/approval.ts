@@ -4,12 +4,12 @@
  * @Date: 2026-05-20 15:51:03
  */
 
-export type ApprovalStatus = "draft" | "reviewing" | "approved" | "rejected";
+export type ApprovalStatus = 'draft' | 'reviewing' | 'approved' | 'rejected'
 
 export interface ApprovalInfo {
-  id: string | number;
-  title: string;
-  applicant: string;
-  status: ApprovalStatus;
-  createdAt: string;
+  id: string | number
+  title: string
+  applicant: string
+  status: ApprovalStatus
+  createdAt: string
 }

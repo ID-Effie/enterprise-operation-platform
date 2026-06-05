@@ -21,7 +21,7 @@
         </p>
 
         <button class="primary-link" type="submit" :disabled="loading">
-          {{ loading ? "登录中..." : "登录" }}
+          {{ loading ? '登录中...' : '登录' }}
         </button>
       </form>
     </section>
@@ -29,34 +29,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-const username = ref("");
-const password = ref("");
-const loading = ref(false);
-const errorMessage = ref("");
+const username = ref('')
+const password = ref('')
+const loading = ref(false)
+const errorMessage = ref('')
 
-const router = useRouter();
-const authStore = useAuthStore();
+const router = useRouter()
+const authStore = useAuthStore()
 
 async function handleLogin() {
   try {
-    loading.value = true;
-    errorMessage.value = "";
+    loading.value = true
+    errorMessage.value = ''
 
     // 这样登录状态就统一归 store 管，不散落在页面里
     await authStore.login({
       username: username.value,
-      password: password.value,
-    });
+      password: password.value
+    })
 
-    router.push("/");
+    router.push('/')
   } catch {
-    errorMessage.value = "账号或密码错误";
+    errorMessage.value = '账号或密码错误'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

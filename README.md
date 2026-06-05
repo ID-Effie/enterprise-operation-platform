@@ -126,38 +126,38 @@
   - `AppHeader` 接收 `title`、`username` props，并通过无参数 `logout` 事件通知父组件退出
   - `AppMain` 通过默认插槽承载 `RouterView`，只负责页面内容容器
   - 已检查布局组件 `props / emits` 能独立说明数据流：数据由 `BasicLayout` 向下传递，菜单选择和退出登录事件由子组件向上传递
-	- Day 18：插槽与业务组件封装
-	  - `PageContainer` 已从单纯的 `title`、`description` props 展示，增强为支持标题区、操作区和默认内容区的业务页面容器
+  - Day 18：插槽与业务组件封装
+    - `PageContainer` 已从单纯的 `title`、`description` props 展示，增强为支持标题区、操作区和默认内容区的业务页面容器
   - `PageContainer` 已新增 `title` 具名插槽，支持父组件自定义标题区；未传插槽时继续使用 `title`、`description` 作为默认内容
   - `PageContainer` 已新增 `actions` 具名插槽，用于承载页面级操作按钮
   - 默认插槽继续承载页面主体内容，例如查询区、筛选摘要、表格区、加载中、错误重试和空数据状态
   - 客户页面已通过 `actions` 插槽放置“新增客户”“导出列表”按钮
   - 订单页面已通过 `actions` 插槽放置“创建订单”“批量处理”按钮
-	  - 用户页面已通过 `actions` 插槽放置“新增用户”“分配角色”按钮
-	  - 已通过客户、订单、用户三个页面验证 `PageContainer` 当前插槽设计足够覆盖常见后台列表页
-	  - 已记录插槽暴露过多会导致组件职责模糊、使用成本变高、父组件依赖内部结构、页面风格不统一等维护问题
-	- Day 19：组合式函数 composable 接入
-	  - 已新增 `src/composables/usePagination.ts`，统一管理列表分页状态和分页方法
-	  - 已新增 `src/composables/useModal.ts`，统一管理新增/编辑弹窗的打开、关闭、模式和当前数据
-	  - 已新增 `src/composables/useLoading.ts`，统一管理请求 loading 状态
-	  - 客户列表已接入 `usePagination` 和 `useLoading`，请求参数使用 `currentPage.value`、`pageSize.value`
-	  - 用户管理已接入 `usePagination`、`useModal`、`useLoading`，新增和编辑按钮可打开对应弹窗
-	  - 订单列表已接入 `usePagination`、`useModal`、`useLoading`，创建和编辑按钮可打开对应弹窗
-	  - 列表请求成功后统一通过 `setTotal(res.data.total)` 更新分页总数
-	  - 查询重置时会调用 `reset()` 恢复分页状态
-	  - 已通过客户、用户、订单列表验证 composable 返回值稳定性
-	  - 主项目已通过 `pnpm build`
-	- Day 20：自定义指令与按钮权限接入
-	  - 已新增 `src/directives/permission.ts`，实现全局权限指令 `v-permission`
-	  - 已新增 `src/directives/index.ts`，统一注册项目自定义指令
-	  - `main.ts` 已在 Pinia 和 Router 注册后调用 `setupDirectives(app)`
-	  - `auth store` 已在登录成功后模拟当前用户权限列表 `permissions`
-	  - 用户管理页已在“新增用户”“分配角色”“编辑”按钮上应用 `v-permission`
-	  - 系统管理页已在“新增配置”和表格“编辑”按钮上应用 `v-permission`
-	  - 权限指令支持单个权限字符串和权限数组，内部统一转换为 `string[]` 后使用 `some` 判断
-	  - 无权限按钮通过 `display: none` 隐藏，有权限按钮保持原有样式展示
-	  - 已验证 `role:create` 无权限时“新增配置”隐藏，未加权限控制的“刷新缓存”仍正常展示
-	  - 已记录前端按钮权限只控制展示，不能替代后端接口鉴权
+    - 用户页面已通过 `actions` 插槽放置“新增用户”“分配角色”按钮
+    - 已通过客户、订单、用户三个页面验证 `PageContainer` 当前插槽设计足够覆盖常见后台列表页
+    - 已记录插槽暴露过多会导致组件职责模糊、使用成本变高、父组件依赖内部结构、页面风格不统一等维护问题
+  - Day 19：组合式函数 composable 接入
+    - 已新增 `src/composables/usePagination.ts`，统一管理列表分页状态和分页方法
+    - 已新增 `src/composables/useModal.ts`，统一管理新增/编辑弹窗的打开、关闭、模式和当前数据
+    - 已新增 `src/composables/useLoading.ts`，统一管理请求 loading 状态
+    - 客户列表已接入 `usePagination` 和 `useLoading`，请求参数使用 `currentPage.value`、`pageSize.value`
+    - 用户管理已接入 `usePagination`、`useModal`、`useLoading`，新增和编辑按钮可打开对应弹窗
+    - 订单列表已接入 `usePagination`、`useModal`、`useLoading`，创建和编辑按钮可打开对应弹窗
+    - 列表请求成功后统一通过 `setTotal(res.data.total)` 更新分页总数
+    - 查询重置时会调用 `reset()` 恢复分页状态
+    - 已通过客户、用户、订单列表验证 composable 返回值稳定性
+    - 主项目已通过 `pnpm build`
+  - Day 20：自定义指令与按钮权限接入
+    - 已新增 `src/directives/permission.ts`，实现全局权限指令 `v-permission`
+    - 已新增 `src/directives/index.ts`，统一注册项目自定义指令
+    - `main.ts` 已在 Pinia 和 Router 注册后调用 `setupDirectives(app)`
+    - `auth store` 已在登录成功后模拟当前用户权限列表 `permissions`
+    - 用户管理页已在“新增用户”“分配角色”“编辑”按钮上应用 `v-permission`
+    - 系统管理页已在“新增配置”和表格“编辑”按钮上应用 `v-permission`
+    - 权限指令支持单个权限字符串和权限数组，内部统一转换为 `string[]` 后使用 `some` 判断
+    - 无权限按钮通过 `display: none` 隐藏，有权限按钮保持原有样式展示
+    - 已验证 `role:create` 无权限时“新增配置”隐藏，未加权限控制的“刷新缓存”仍正常展示
+    - 已记录前端按钮权限只控制展示，不能替代后端接口鉴权
 - Day 22：项目骨架、Vite 配置与路径别名复盘
   - 已复盘中后台项目按职责拆目录的原因和目录边界
   - 已确认主项目具备 `api`、`assets`、`components`、`composables`、`constants`、`directives`、`layouts`、`router`、`stores`、`styles`、`types`、`utils`、`views` 基础目录
@@ -189,6 +189,17 @@
   - 已用 200、业务错误、500、401 四类响应验证拦截器分支
   - 已确认页面层没有重复处理全局 401、500、网络错误逻辑
   - 已沉淀 Day 25 学习笔记：`notes/day25-axios-request-wrapper-notes.md`
+- Day 26：代码规范与提交规范
+  - 已新增 `eslint.config.js`，接入 JavaScript、TypeScript、Vue 推荐规则
+  - 已新增 `.prettierrc`，统一项目格式化规则
+  - 已新增 `.prettierignore`，排除构建产物、依赖目录和 pnpm 锁文件
+  - 已新增 `lint`、`lint:fix`、`format`、`prepare` 命令
+  - 已新增 husky `pre-commit`，提交前执行 `pnpm exec lint-staged`
+  - 已新增 `lint-staged` 配置，只处理本次暂存区文件
+  - 已补充项目级 VS Code 保存配置，统一保存时格式化行为
+  - 已将分页按钮中多语句 `@click` 抽成 `handlePrevPage`、`handleNextPage`，避免保存格式化后 Vue 模板表达式解析失败
+  - 已通过 `pnpm run format`、`pnpm run lint`、`pnpm run build` 验证
+  - 已沉淀 Day 26 学习笔记：`notes/day26-code-style-commit-standard-notes.md`
 
 ## 目录结构
 
@@ -228,6 +239,10 @@
   - `order.ts`：订单列表相关类型
   - `approval.ts`：审批状态和审批信息相关类型
 - src/styles：全局样式
+- eslint.config.js：ESLint flat config，统一 JavaScript、TypeScript、Vue 代码质量规则
+- .prettierrc：Prettier 格式化规则
+- .prettierignore：Prettier 忽略文件
+- .husky/pre-commit：提交前运行 lint-staged
 
 ## 工程配置
 
@@ -239,6 +254,16 @@
   - 开启 `strict`。
   - 通过 `paths` 配置 `@/*` 到 `./src/*`。
   - 使用 `types: ["vite/client"]` 让 TypeScript 识别 Vite 的 `import.meta.env` 类型。
+- `eslint.config.js`
+  - 使用 ESLint flat config。
+  - 接入 `@eslint/js`、`typescript-eslint`、`eslint-plugin-vue` 推荐规则。
+  - 使用 `eslint-config-prettier` 关闭和 Prettier 冲突的格式类规则。
+  - 忽略 `dist`、`node_modules` 等无关目录。
+- `.prettierrc`
+  - 统一使用无分号、单引号、`printWidth: 100`。
+- `.husky/pre-commit`
+  - 提交前执行 `pnpm exec lint-staged`。
+  - 只检查本次 `git add` 到暂存区的文件。
 
 当前路径别名写法：
 
@@ -423,6 +448,10 @@ meta: {
   - 订单详情和订单处理动作
   - 系统设置真实接口数据和编辑动作
 - 工程能力：
+  - ESLint 代码质量检查
+  - Prettier 代码格式化
+  - husky 提交前检查
+  - lint-staged 暂存区文件检查
   - 路由拆分
   - 类型定义整理
   - 继续沉淀通用组件
@@ -434,7 +463,7 @@ meta: {
 
 ```bash
 pnpm install
-pnpm dev
+pnpm run dev
 ```
 
 启动后访问 Vite 输出的本地地址，例如：
@@ -468,13 +497,47 @@ http://localhost:5173/
 ## 构建检查
 
 ```bash
-pnpm build
+pnpm run build
 ```
 
 单独执行 Vue 类型检查：
 
 ```bash
 pnpm exec vue-tsc -p tsconfig.app.json --noEmit
+```
+
+## 代码规范检查
+
+格式化项目文件：
+
+```bash
+pnpm run format
+```
+
+执行 ESLint 检查：
+
+```bash
+pnpm run lint
+```
+
+自动修复部分 ESLint 问题：
+
+```bash
+pnpm run lint:fix
+```
+
+提交前会通过 husky 自动执行：
+
+```bash
+pnpm exec lint-staged
+```
+
+建议提交前完整执行：
+
+```bash
+pnpm run format
+pnpm run lint
+pnpm run build
 ```
 
 ## 当前验证重点
@@ -518,6 +581,11 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - 401 由响应拦截器统一清理 token 并跳转登录页
 - 500 和网络错误由响应拦截器统一分类处理
 - 开发阶段 mock 响应通过 `createMockAdapter()` 接入 Axios adapter，不再在 `request()` 内部写 mock 分支
+- `pnpm run format` 能统一代码格式
+- `pnpm run lint` 能通过 ESLint 代码质量检查
+- `pnpm run build` 能通过类型检查和生产构建
+- `git commit` 前能通过 husky 触发 lint-staged
+- Vue 模板事件中多步逻辑已抽成函数，避免保存格式化后产生模板表达式解析错误
 - 已用 200、业务错误、500、401 四类 adapter mock 响应验证拦截器分支
 - 客户/订单列表能区分查询状态、筛选摘要和请求副作用：`reactive` 管理条件，`computed` 生成摘要，`watch` 触发请求
 - 客户、用户、订单列表的分页状态来自 `usePagination`

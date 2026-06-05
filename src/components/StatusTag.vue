@@ -12,13 +12,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import type { StatusColor } from "@/constants/status";
+import { computed } from 'vue'
+import type { StatusColor } from '@/constants/status'
 
 const props = defineProps<{
-  text: string;
-  color: StatusColor;
-}>();
+  text: string
+  color: StatusColor
+}>()
 
-const tagClass = computed(() => `status-pill--${props.color}`);
+const tagClass = computed(() => `status-pill--${props.color}`)
 </script>

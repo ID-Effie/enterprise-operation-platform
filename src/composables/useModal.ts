@@ -3,31 +3,31 @@
  * @Author: zhaoyang.sun@proinnova.com.cn
  * @Date: 2026-05-29 16:54:31
  */
-import { ref } from "vue";
+import { ref } from 'vue'
 
-type ModalMode = "create" | "edit";
+type ModalMode = 'create' | 'edit'
 
 export function useModal<T>() {
-  const visible = ref(false);
-  const mode = ref<ModalMode>("create");
-  const current = ref<T | null>(null);
+  const visible = ref(false)
+  const mode = ref<ModalMode>('create')
+  const current = ref<T | null>(null)
 
   // 方法命名建议用动作词
   const openCreate = () => {
-    mode.value = "create";
-    current.value = null;
-    visible.value = true;
-  };
+    mode.value = 'create'
+    current.value = null
+    visible.value = true
+  }
 
   const openEdit = (record: T) => {
-    mode.value = "edit";
-    current.value = record;
-    visible.value = true;
-  };
+    mode.value = 'edit'
+    current.value = record
+    visible.value = true
+  }
 
   const close = () => {
-    visible.value = false;
-  };
+    visible.value = false
+  }
 
   return {
     visible,
@@ -35,6 +35,6 @@ export function useModal<T>() {
     current,
     openCreate,
     openEdit,
-    close,
-  };
+    close
+  }
 }

@@ -31,8 +31,8 @@
 
 <script setup lang="ts">
 interface PageContainerProps {
-  title?: string;
-  description?: string;
+  title?: string
+  description?: string
 }
-defineProps<PageContainerProps>();
+defineProps<PageContainerProps>()
 </script>

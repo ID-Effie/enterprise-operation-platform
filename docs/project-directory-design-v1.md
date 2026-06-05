@@ -95,21 +95,21 @@ enterprise-operation-platform/
 
 ## 三、目录职责说明
 
-| 目录 | 职责 | 当前示例 |
-| --- | --- | --- |
-| `src/api` | 接口请求层，统一管理请求入口和业务接口模块 | `request.ts`、`modules/user.ts` |
-| `src/assets` | 静态资源，如图片、字体、图标 | `hero.png` |
-| `src/components` | 通用组件、布局子组件、可复用业务组件 | `PageContainer.vue`、`StatusTag.vue` |
-| `src/composables` | Vue 组合式函数，封装可复用状态逻辑 | `usePagination.ts`、`useModal.ts` |
-| `src/constants` | 固定业务常量、状态映射、选项配置 | `status.ts` |
-| `src/directives` | 全局或局部自定义指令 | `permission.ts` |
-| `src/layouts` | 页面整体布局，不承载具体业务列表 | `BasicLayout.vue` |
-| `src/router` | 路由表、路由守卫、路由元信息 | `index.ts` |
-| `src/stores` | Pinia 全局状态管理 | `auth.ts` |
-| `src/styles` | 全局样式、变量、重置样式、主题样式 | 当前预留 |
-| `src/types` | TypeScript 类型定义 | `common.ts`、`user.ts` |
-| `src/utils` | 通用工具函数，不依赖具体页面状态 | 当前预留 |
-| `src/views` | 页面级组件，通常和路由对应 | `UsersView.vue`、`OrdersView.vue` |
+| 目录              | 职责                                       | 当前示例                             |
+| ----------------- | ------------------------------------------ | ------------------------------------ |
+| `src/api`         | 接口请求层，统一管理请求入口和业务接口模块 | `request.ts`、`modules/user.ts`      |
+| `src/assets`      | 静态资源，如图片、字体、图标               | `hero.png`                           |
+| `src/components`  | 通用组件、布局子组件、可复用业务组件       | `PageContainer.vue`、`StatusTag.vue` |
+| `src/composables` | Vue 组合式函数，封装可复用状态逻辑         | `usePagination.ts`、`useModal.ts`    |
+| `src/constants`   | 固定业务常量、状态映射、选项配置           | `status.ts`                          |
+| `src/directives`  | 全局或局部自定义指令                       | `permission.ts`                      |
+| `src/layouts`     | 页面整体布局，不承载具体业务列表           | `BasicLayout.vue`                    |
+| `src/router`      | 路由表、路由守卫、路由元信息               | `index.ts`                           |
+| `src/stores`      | Pinia 全局状态管理                         | `auth.ts`                            |
+| `src/styles`      | 全局样式、变量、重置样式、主题样式         | 当前预留                             |
+| `src/types`       | TypeScript 类型定义                        | `common.ts`、`user.ts`               |
+| `src/utils`       | 通用工具函数，不依赖具体页面状态           | 当前预留                             |
+| `src/views`       | 页面级组件，通常和路由对应                 | `UsersView.vue`、`OrdersView.vue`    |
 
 ## 四、核心目录设计
 
@@ -475,10 +475,10 @@ TypeScript 配置：
 使用示例：
 
 ```ts
-import { request } from "@/api/request";
-import { useAuthStore } from "@/stores/auth";
-import type { UserInfo } from "@/types/user";
-import PageContainer from "@/components/PageContainer.vue";
+import { request } from '@/api/request'
+import { useAuthStore } from '@/stores/auth'
+import type { UserInfo } from '@/types/user'
+import PageContainer from '@/components/PageContainer.vue'
 ```
 
 规则：
@@ -541,21 +541,21 @@ OrderStatus
 
 新增功能时按下面规则判断：
 
-| 新增内容 | 放置位置 |
-| --- | --- |
-| 新页面 | `src/views` |
-| 页面级路由 | `src/router/index.ts` |
-| 通用 UI 组件 | `src/components` |
-| 业务接口 | `src/api/modules` |
-| 请求通用逻辑 | `src/api/request.ts` |
-| 业务类型 | `src/types` |
-| 状态文案、颜色、选项 | `src/constants` |
-| 跨页面状态 | `src/stores` |
-| 可复用状态逻辑 | `src/composables` |
-| 自定义指令 | `src/directives` |
-| 通用纯函数 | `src/utils` |
-| 全局样式 | `src/styles` |
-| 图片字体等资源 | `src/assets` |
+| 新增内容             | 放置位置              |
+| -------------------- | --------------------- |
+| 新页面               | `src/views`           |
+| 页面级路由           | `src/router/index.ts` |
+| 通用 UI 组件         | `src/components`      |
+| 业务接口             | `src/api/modules`     |
+| 请求通用逻辑         | `src/api/request.ts`  |
+| 业务类型             | `src/types`           |
+| 状态文案、颜色、选项 | `src/constants`       |
+| 跨页面状态           | `src/stores`          |
+| 可复用状态逻辑       | `src/composables`     |
+| 自定义指令           | `src/directives`      |
+| 通用纯函数           | `src/utils`           |
+| 全局样式             | `src/styles`          |
+| 图片字体等资源       | `src/assets`          |
 
 ## 八、边界规则
 
@@ -580,16 +580,16 @@ OrderStatus
 类型文件只描述结构：
 
 ```ts
-export type UserStatus = "enabled" | "disabled";
+export type UserStatus = 'enabled' | 'disabled'
 ```
 
 常量文件描述运行时映射：
 
 ```ts
 export const userStatusText: Record<UserStatus, string> = {
-  enabled: "启用",
-  disabled: "禁用",
-};
+  enabled: '启用',
+  disabled: '禁用'
+}
 ```
 
 ### store 和 composable 的边界
@@ -638,4 +638,3 @@ V1 阶段目录设计满足以下标准：
 - 将请求层从 mock 请求升级为真实 Axios 实例和拦截器。
 
 V1 阶段先保持结构清晰、职责明确，不提前做过度拆分。
-

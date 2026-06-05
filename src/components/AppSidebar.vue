@@ -21,14 +21,14 @@
   </aside>
 </template>
 <script setup lang="ts">
-import AppSideMenu from "./AppSideMenu.vue";
-import type { MenuItem } from "@/types/menu";
+import AppSideMenu from './AppSideMenu.vue'
+import type { MenuItem } from '@/types/menu'
 defineProps<{
-  menus: MenuItem[];
-  activePath: string;
-}>();
+  menus: MenuItem[]
+  activePath: string
+}>()
 
 const emit = defineEmits<{
-  select: [path: MenuItem["path"]];
-}>();
+  select: [path: MenuItem['path']]
+}>()
 </script>

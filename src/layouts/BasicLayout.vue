@@ -16,19 +16,11 @@
 <template>
   <div class="app-layout">
     <!-- 侧边栏 -->
-    <AppSidebar
-      :menus="menus"
-      :active-path="route.path"
-      @select="handleMenuSelect"
-    />
+    <AppSidebar :menus="menus" :active-path="route.path" @select="handleMenuSelect" />
 
     <section class="app-shell">
       <!-- 顶部栏 -->
-      <AppHeader
-        :title="currentTitle"
-        :username="userStore.username"
-        @logout="logOut"
-      />
+      <AppHeader :title="currentTitle" :username="userStore.username" @logout="logOut" />
 
       <!-- 内容区 Main =>当前路由页面 -->
       <AppMain>
@@ -39,41 +31,41 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { getUserMenus } from "@/api/modules/menu";
-import type { MenuItem } from "@/types/menu";
-import AppSidebar from "@/components/AppSidebar.vue";
-import AppHeader from "@/components/AppHeader.vue";
-import AppMain from "@/components/AppMain.vue";
-import { useAuthStore } from "@/stores/auth";
-import { useUserStore } from "@/stores/user";
+import { computed, ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getUserMenus } from '@/api/modules/menu'
+import type { MenuItem } from '@/types/menu'
+import AppSidebar from '@/components/AppSidebar.vue'
+import AppHeader from '@/components/AppHeader.vue'
+import AppMain from '@/components/AppMain.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 
 // 菜单 path 要和路由 path 对上,否则点击菜单会进入 404 或空页面。
 
-const route = useRoute(); // 获取当前路由信息。只能读
-const router = useRouter(); // 路由实例，可以跳转
-const menus = ref<MenuItem[]>([]);
-const authStore = useAuthStore();
-const userStore = useUserStore();
+const route = useRoute() // 获取当前路由信息。只能读
+const router = useRouter() // 路由实例，可以跳转
+const menus = ref<MenuItem[]>([])
+const authStore = useAuthStore()
+const userStore = useUserStore()
 
 onMounted(async () => {
-  const res = await getUserMenus();
-  menus.value = res.data;
-});
+  const res = await getUserMenus()
+  menus.value = res.data
+})
 
 const currentTitle = computed(() => {
-  const activeMenu = menus.value.find((item) => item.path === route.path);
+  const activeMenu = menus.value.find((item) => item.path === route.path)
 
-  return activeMenu?.title ?? "运营平台";
-});
+  return activeMenu?.title ?? '运营平台'
+})
 
 async function logOut() {
-  await authStore.logout();
-  router.push("/login");
+  await authStore.logout()
+  router.push('/login')
 }
 
-function handleMenuSelect(path: MenuItem["path"]) {
-  console.log("当前菜单：", path);
+function handleMenuSelect(path: MenuItem['path']) {
+  console.log('当前菜单：', path)
 }
 </script>

@@ -4,19 +4,19 @@
  * @Date: 2026-05-18 19:08:23
  */
 
-import type { ID } from "./common";
+import type { ID } from './common'
 
 // MenuType 可以区分目录、菜单、按钮。
-export type MenuType = "catalog" | "menu" | "button";
+export type MenuType = 'catalog' | 'menu' | 'button'
 
 export interface MenuItem {
-  id: ID;
-  title: string;
-  path: string;
-  name?: string;
-  icon?: string;
-  type: MenuType;
-  parentId?: ID;
-  permission?: string; // permission 可以用于按钮权限
-  children?: MenuItem[]; // children?: MenuItem[] 表示菜单可以递归嵌套
+  id: ID
+  title: string
+  path: string
+  name?: string
+  icon?: string
+  type: MenuType
+  parentId?: ID
+  permission?: string // permission 可以用于按钮权限
+  children?: MenuItem[] // children?: MenuItem[] 表示菜单可以递归嵌套
 }

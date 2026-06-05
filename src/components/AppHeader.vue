@@ -7,16 +7,16 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    title: string;
-    username?: string;
+    title: string
+    username?: string
   }>(),
   {
-    username: "管理员",
-  },
-);
+    username: '管理员'
+  }
+)
 const emit = defineEmits<{
-  logout: [];
-}>();
+  logout: []
+}>()
 </script>
 
 <template>
@@ -27,9 +27,7 @@ const emit = defineEmits<{
     </div>
     <div class="header-actions">
       <div class="header-user">{{ username }}</div>
-      <button class="log-out" type="button" @click="emit('logout')">
-        退出
-      </button>
+      <button class="log-out" type="button" @click="emit('logout')">退出</button>
     </div>
   </header>
 </template>
