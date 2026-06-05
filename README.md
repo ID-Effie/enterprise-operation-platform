@@ -179,6 +179,16 @@
   - 已验证未登录访问 `/dashboard` 会跳 `/login?redirect=/dashboard`
   - 已验证访问不存在路径会进入 404 页面
   - 已沉淀 Day 23 学习笔记：`notes/day23-vue-router-meta-guards-notes.md`
+- Day 25：Axios 请求封装与请求层升级
+  - 已将 `src/api/request.ts` 升级为真正的 Axios 请求实例
+  - 已通过请求拦截器统一注入 token
+  - 已通过响应拦截器统一处理业务错误、401、500 和网络错误
+  - 已移除 `request()` 内部的 `mockData` 分支和 `MockRequestConfig`
+  - 已新增 `src/api/mockAdapter.ts`，使用 Axios adapter 模拟后端响应
+  - `auth.ts`、`user.ts`、`customer.ts`、`order.ts`、`menu.ts` 已统一改为通过 `adapter: createMockAdapter(...)` 模拟接口
+  - 已用 200、业务错误、500、401 四类响应验证拦截器分支
+  - 已确认页面层没有重复处理全局 401、500、网络错误逻辑
+  - 已沉淀 Day 25 学习笔记：`notes/day25-axios-request-wrapper-notes.md`
 
 ## 目录结构
 
@@ -201,6 +211,7 @@
   - `index.ts`：统一注册项目自定义指令
 - src/api：接口请求
   - `request.ts`：统一请求入口和响应结构
+  - `mockAdapter.ts`：开发阶段通过 Axios adapter 模拟后端响应
   - `modules/auth.ts`：认证相关接口
   - `modules/user.ts`：用户相关接口
   - `modules/menu.ts`：菜单相关接口
@@ -336,8 +347,11 @@ meta: {
   - 统一响应结构 `ApiResponse<T>`
   - 统一错误结构 `ApiError`
   - 项目请求配置 `RequestConfig`
-  - mock 请求配置 `MockRequestConfig<T>`
-  - mock 请求函数 `request<T>()`
+  - Axios 请求实例 `service`
+  - 请求拦截器统一注入 token
+  - 响应拦截器统一处理业务错误、401、500 和网络错误
+  - `request<T>()` 统一返回 `Promise<ApiResponse<T>>`
+  - `createMockAdapter()` 在开发阶段模拟后端响应，同时保持请求经过 Axios 拦截器链路
   - 认证接口模块 `auth`
   - 用户接口模块 `user`
   - 菜单接口模块 `menu`
@@ -412,7 +426,7 @@ meta: {
   - 路由拆分
   - 类型定义整理
   - 继续沉淀通用组件
-  - 将 mock 请求替换为真实接口请求
+  - 后续接真实后端时，将 `createMockAdapter()` 替换为真实接口请求
 - 状态管理：
   - 菜单权限
 
@@ -497,8 +511,14 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - 登录页通过 `authStore.login()` 更新登录状态
 - `vue-tsc` 类型检查通过
 - `request<T>()` 返回 `Promise<ApiResponse<T>>`
-- `auth.ts`、`user.ts`、`customer.ts` mock 接口有明确的入参和出参类型
+- `auth.ts`、`user.ts`、`customer.ts` 接口有明确的入参和出参类型
 - 列表接口查询参数使用 `params`，登录和修改类接口请求体使用 `data`
+- 请求层使用 Axios 实例统一处理 baseURL、超时、token 注入和响应拦截
+- 业务错误由响应拦截器根据 `code !== 0` 统一 reject
+- 401 由响应拦截器统一清理 token 并跳转登录页
+- 500 和网络错误由响应拦截器统一分类处理
+- 开发阶段 mock 响应通过 `createMockAdapter()` 接入 Axios adapter，不再在 `request()` 内部写 mock 分支
+- 已用 200、业务错误、500、401 四类 adapter mock 响应验证拦截器分支
 - 客户/订单列表能区分查询状态、筛选摘要和请求副作用：`reactive` 管理条件，`computed` 生成摘要，`watch` 触发请求
 - 客户、用户、订单列表的分页状态来自 `usePagination`
 - 客户、用户、订单列表的请求 loading 状态来自 `useLoading`
@@ -511,7 +531,7 @@ pnpm exec vue-tsc -p tsconfig.app.json --noEmit
 - 用户管理页中 `user:create`、`user:update` 对应按钮显示，`user:assign-role` 对应按钮隐藏
 - 系统管理页中 `role:create` 对应按钮隐藏，未加权限控制的“刷新缓存”按钮正常显示
 - 权限指令只控制前端按钮展示，不能替代后端接口鉴权
-- mock 返回结果通过 `mockData` 提供，和请求参数分开
+- mock 返回结果通过 Axios adapter 提供，请求参数仍通过 `params` 或 `data` 表达
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 登录页不显示后台布局
 - 登录页输入 `admin` / `123456` 后能跳转 `/dashboard`
