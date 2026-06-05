@@ -4,6 +4,7 @@
  * @Date: 2026-05-19 15:25:18
  */
 import { request } from "../request";
+import { createMockAdapter } from "../mockAdapter";
 import type { ApiResponse, PageResult } from "@/types/common";
 import type { OrderInfo, OrderListQuery } from "@/types/order";
 
@@ -57,11 +58,15 @@ export function getOrderList(
   return request<PageResult<OrderInfo>>({
     url: "/order/list",
     data: params,
-    mockData: {
-      list: filteredOrders,
-      total: filteredOrders.length,
-      page: params.page,
-      pageSize: params.pageSize,
-    },
+    adapter: createMockAdapter(200, {
+      code: 0,
+      message: "请求成功",
+      data: {
+        list: filteredOrders,
+        total: filteredOrders.length,
+        page: params.page,
+        pageSize: params.pageSize,
+      },
+    }),
   });
 }
