@@ -6,8 +6,10 @@
 <template>
   <PageContainer title="客户列表" description="用于承载客户基础信息、客户分层和客户详情入口。">
     <template #actions>
-      <button type="button" class="primary-link">新增客户</button>
-      <button type="button" class="secondary-link">导出列表</button>
+      <button v-permission="'customer:create'" type="button" class="primary-link">新增客户</button>
+      <button v-permission="'customer:export'" type="button" class="secondary-link">
+        导出列表
+      </button>
     </template>
 
     <section class="query-panel" aria-label="客户查询区">

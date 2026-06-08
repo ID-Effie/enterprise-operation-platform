@@ -20,31 +20,36 @@ export function getUserMenus(): Promise<ApiResponse<MenuItem[]>> {
           id: 1,
           title: '首页',
           path: '/dashboard',
-          type: 'menu'
+          type: 'menu',
+          permission: 'dashboard:view' // 菜单数据本身知道“显示我需要什么权限”。
         },
         {
           id: 2,
           title: '客户管理',
           path: '/customers',
-          type: 'menu'
+          type: 'menu',
+          permission: 'customer:list'
         },
         {
           id: 3,
           title: '订单管理',
           path: '/orders',
-          type: 'menu'
+          type: 'menu',
+          permission: 'order:list'
         },
         {
           id: 4,
           title: '用户管理',
           path: '/users',
-          type: 'menu'
+          type: 'menu',
+          permission: 'user:list'
         },
         {
           id: 5,
           title: '系统管理',
           path: '/system',
-          type: 'menu'
+          type: 'menu',
+          permission: 'system:manage'
         }
       ]
     })

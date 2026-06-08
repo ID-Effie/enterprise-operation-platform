@@ -200,6 +200,17 @@
   - 已将分页按钮中多语句 `@click` 抽成 `handlePrevPage`、`handleNextPage`，避免保存格式化后 Vue 模板表达式解析失败
   - 已通过 `pnpm run format`、`pnpm run lint`、`pnpm run build` 验证
   - 已沉淀 Day 26 学习笔记：`notes/day26-code-style-commit-standard-notes.md`
+- Day 27：权限骨架与菜单生成
+  - 已建立 `admin`、`manager`、`staff` 三类 mock 账号和角色权限映射
+  - `authStore` 负责登录、退出和 `restoreSession()` 会话恢复
+  - `userStore` 负责当前用户信息和角色派生
+  - `permissionStore` 负责当前权限点、菜单路径和 `hasPermissions()` 判断
+  - `getUserMenus()` 返回带 `permission` 的菜单数据，菜单权限和路由 `meta.permission` 保持一致
+  - `BasicLayout` 已根据 `permissionStore.permissions` 过滤侧边栏菜单
+  - 路由守卫已在刷新后通过 `restoreSession()` 恢复用户和权限，再进行页面权限判断
+  - 客户、订单、用户、系统页面的操作按钮已通过 `v-permission` 接入按钮权限
+  - 已验证 staff 登录不会再被错误恢复为 admin 权限
+  - 已沉淀 Day 27 学习笔记：`/Users/szy/Desktop/Plan/notes/day27-permission-menu-filtering-notes.md`
 
 ## 目录结构
 
@@ -392,9 +403,12 @@ meta: {
   - Pinia 已接入主应用
   - 登录状态 store `useAuthStore`
   - 登录状态类型 `AuthState`
-  - 登录派生状态 `isLogin`、`username`
+  - 登录派生状态 `isLogin`
   - 登录动作 `login(params: LoginParams): Promise<void>`
+  - 会话恢复动作 `restoreSession(): Promise<void>`
   - 退出动作 `logout(): Promise<void>`
+  - 用户信息 store `useUserStore`，负责当前用户和角色派生
+  - 权限 store `usePermissionStore`，负责权限点、过滤后的菜单路径和权限判断
 - 组合式函数：
   - `usePagination`
   - 返回 `currentPage`、`pageSize`、`total`、`totalPages`
@@ -406,10 +420,17 @@ meta: {
   - 返回 `loading`、`start`、`stop`、`toggle`
 - 自定义指令：
   - `v-permission`
-  - 从 `authStore.permissions` 读取当前用户权限列表
+  - 从 `permissionStore.permissions` 读取当前用户权限列表
   - 支持 `v-permission="'user:create'"` 单权限写法
   - 支持 `v-permission="['user:create', 'admin']"` 多权限写法
   - 使用 `display: none` 控制无权限按钮展示
+- 权限骨架：
+  - `auth.ts` 中通过 `rolePermissionMap` 维护当前 mock 角色权限
+  - `menu.ts` 中菜单项通过 `permission` 声明可见条件
+  - `BasicLayout` 根据权限过滤菜单，并把可见菜单路径写入 `permissionStore.menus`
+  - `router.beforeEach` 根据 `meta.permission` 拦截无权限页面
+  - `restoreSession()` 根据 mock token 恢复当前用户和权限
+  - 前端权限只控制展示和访问体验，不能替代后端接口鉴权
 - 登录流程：
   - 登录页表单输入
   - 点击登录后调用 `authStore.login()`
@@ -476,21 +497,22 @@ http://localhost:5173/
 
 1. 打开本地地址后访问 `/dashboard`。
 2. 如果浏览器里没有 token，会自动跳转到 `/login`。
-3. 在登录页输入：
+3. 在登录页使用任一 mock 账号登录：
 
 ```text
-账号：admin
-密码：123456
+admin / 123456
+manager / 123456
+staff / 123456
 ```
 
-4. 点击登录，登录成功后进入首页 `/dashboard`。
-5. 点击侧边栏菜单，依次验证客户管理、订单管理、用户管理、系统管理页面可以正常切换。
-6. 在客户列表验证加载态、分页展示和查询重置。
-7. 在用户管理点击“新增用户”和“编辑”，确认弹窗可以打开和关闭。
-8. 在订单列表点击“创建订单”和“编辑”，确认弹窗可以打开并展示当前订单。
-9. 在用户管理确认“分配角色”按钮因缺少 `user:assign-role` 权限而隐藏。
-10. 在系统管理确认“新增配置”因缺少 `role:create` 权限而隐藏，“刷新缓存”仍正常显示。
-11. 访问 `/users`，因为当前路由权限数组中注释了 `user:list`，确认进入 403 页面。
+4. 使用 `admin` 登录，确认侧边栏显示首页、客户管理、订单管理、用户管理、系统管理。
+5. 使用 `manager` 登录，确认侧边栏显示首页、客户管理、订单管理、用户管理，不显示系统管理。
+6. 使用 `staff` 登录，确认侧边栏只显示首页、客户管理、订单管理。
+7. 使用 `staff` 进入客户管理，确认“新增客户”“导出列表”按钮隐藏。
+8. 使用 `staff` 进入订单管理，确认“创建订单”“批量处理”“编辑”按钮隐藏。
+9. 使用 `staff` 手动访问 `/users`，确认跳转 `/403`。
+10. 使用 `staff` 手动访问 `/system`，确认跳转 `/403`。
+11. 登录后刷新页面，确认 `restoreSession()` 能恢复当前角色权限，菜单和按钮不会错乱。
 12. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
 13. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
 
@@ -570,7 +592,9 @@ pnpm run build
 - 用户页和订单页能通过 `StatusTag` 复用状态标签展示
 - Pinia 已通过 `createPinia()` 接入主应用
 - `auth store` 的 `state`、`getters`、`actions` 均有明确类型
-- `auth store` 能统一管理 `token`、`userInfo`、`roles`、`permissions`
+- `authStore` 管理 `token`、登录、退出和刷新恢复
+- `userStore` 管理当前用户信息和角色派生
+- `permissionStore` 管理当前权限点、可见菜单路径和权限判断
 - 登录页通过 `authStore.login()` 更新登录状态
 - `vue-tsc` 类型检查通过
 - `request<T>()` 返回 `Promise<ApiResponse<T>>`
@@ -595,18 +619,22 @@ pnpm run build
 - 列表请求成功后通过 `setTotal(res.data.total)` 更新总数和总页数
 - 查询重置时通过 `reset()` 恢复分页状态
 - `v-permission` 已通过 `setupDirectives(app)` 注册为全局指令
-- `v-permission` 从 `authStore.permissions` 判断当前用户是否拥有按钮权限
-- 用户管理页中 `user:create`、`user:update` 对应按钮显示，`user:assign-role` 对应按钮隐藏
-- 系统管理页中 `role:create` 对应按钮隐藏，未加权限控制的“刷新缓存”按钮正常显示
+- `v-permission` 从 `permissionStore.permissions` 判断当前用户是否拥有按钮权限
+- 客户管理页中 `customer:create`、`customer:export` 对应按钮受权限控制
+- 订单管理页中 `order:create`、`order:batch`、`order:update` 对应按钮受权限控制
+- 用户管理页中 `user:create`、`user:update`、`user:assign-role` 对应按钮受权限控制
+- 系统管理页中 `role:create`、`role:update` 对应按钮受权限控制，未加权限控制的“刷新缓存”按钮正常显示
 - 权限指令只控制前端按钮展示，不能替代后端接口鉴权
 - mock 返回结果通过 Axios adapter 提供，请求参数仍通过 `params` 或 `data` 表达
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
+- 侧边栏菜单会根据当前角色权限过滤，staff 只看到首页、客户管理、订单管理
 - 登录页不显示后台布局
-- 登录页输入 `admin` / `123456` 后能跳转 `/dashboard`
+- 登录页输入 `admin`、`manager`、`staff` 任一 mock 账号和 `123456` 后能跳转 `/dashboard`
 - 登录页输入错误账号或密码时能展示错误提示
 - 登录过程中按钮进入禁用状态
 - 未登录访问 `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 会跳转登录页
 - 登录成功后浏览器 `localStorage` 中会写入 `token`
+- 刷新页面后能通过 `restoreSession()` 恢复当前 mock 角色和权限
 - 已登录访问 `/login` 会自动跳转 `/dashboard`
 - 后台业务路由均作为 `BasicLayout` 的子路由展示，不再重复嵌套空子路由
 - 后台业务路由均具备 `title`、`requiresAuth`、`permission`

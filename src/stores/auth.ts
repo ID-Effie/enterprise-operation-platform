@@ -12,9 +12,43 @@ import { login as loginApi, logout as logoutApi } from '@/api/modules/auth'
 import type { LoginParams } from '@/types/user'
 import { useUserStore } from '@/stores/user'
 import { usePermissionStore } from '@/stores/permission'
+import { getUserInfo } from '@/api/modules/user'
 
 interface AuthState {
   token: string
+}
+
+const rolePermissionMap = {
+  admin: [
+    'dashboard:view',
+    'customer:list',
+    'order:list',
+    'user:list',
+    'system:manage',
+    'customer:create',
+    'customer:export',
+    'order:create',
+    'order:batch',
+    'order:update',
+    'user:create',
+    'user:update',
+    'user:assign-role',
+    'role:create',
+    'role:update'
+  ],
+  manager: [
+    'dashboard:view',
+    'customer:list',
+    'order:list',
+    'user:list',
+    'customer:create',
+    'customer:export',
+    'order:create',
+    'order:update',
+    'user:create',
+    'user:update'
+  ],
+  staff: ['dashboard:view', 'customer:list', 'order:list']
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -42,6 +76,7 @@ export const useAuthStore = defineStore('auth', {
       const permissionStore = usePermissionStore()
       // 1.调接口登录：
       const res = await loginApi(params)
+      const role = res.data.userInfo.role
 
       // 2.把接口返回的数据存进 store：
       this.token = res.data.token
@@ -49,24 +84,16 @@ export const useAuthStore = defineStore('auth', {
       // 因为你当前项目里的 UserInfo (line 14) 只有一个 role 字段，不是数组。
       // 但计划要求 store 里有 roles，所以这里先把单个角色包装成数组
       // 以后如果后端返回 roles: UserRole[]，这里再改就行。
-      permissionStore.setPermissions([
-        'user:create',
-        'user:update',
-        'user:assign-role',
-        'role:create',
-        'role:update',
-        'dashboard:view',
-        'customer:list',
-        'order:list',
-        'user:list',
-        'system:manage'
-      ])
+      permissionStore.setPermissions(rolePermissionMap[role])
 
       // 把 token 存进 localStorage，方便刷新后恢复：
       localStorage.setItem('token', res.data.token)
     },
 
-    //
+    // 当前 restoreSession 只是 mock 恢复；
+    // 真实项目里应通过 token 请求 /user/info 或 /me；
+    // 后端返回真实 userInfo 和权限；
+    // 前端不能自己猜当前用户角色。
     async restoreSession(): Promise<void> {
       const userStore = useUserStore()
       const permissionStore = usePermissionStore()
@@ -75,32 +102,26 @@ export const useAuthStore = defineStore('auth', {
         return
       }
 
-      userStore.setUserInfo({
-        id: 1,
-        username: 'admin',
-        role: 'admin',
-        status: 'enabled',
-        createdAt: '2026-05-18'
-      })
-
       /**
        * 有 token
           -> 请求 /me 获取 userInfo
           -> 请求 /permissions 获取 permissions
           -> 写入 userStore 和 permissionStore
       */
-      permissionStore.setPermissions([
-        'dashboard:view',
-        'customer:list',
-        'order:list',
-        'user:list',
-        'system:manage',
-        'user:create',
-        'user:update',
-        'user:assign-role',
-        'role:create',
-        'role:update'
-      ])
+      try {
+        const res = await getUserInfo()
+        const userInfo = res.data
+
+        // 根据 userInfo.role 从 rolePermissionMap 找权限
+        // 写入 userStore 和 permissionStore
+        userStore.setUserInfo(userInfo)
+        permissionStore.setPermissions(rolePermissionMap[userInfo.role])
+      } catch {
+        this.token = ''
+        userStore.clearUserInfo()
+        permissionStore.clearPermission()
+        localStorage.removeItem('token')
+      }
     },
 
     // 负责退出登录清理

@@ -3,26 +3,63 @@ import { createMockAdapter } from '../mockAdapter'
 import type { ApiResponse, PageResult } from '@/types/common'
 import type {
   UserInfo,
+  UserRole,
   UserListQuery,
   DeleteUserParams,
   UpdateUserStatusParams,
   UpdateUserStatusResult
 } from '@/types/user'
 
+const mockUserInfoMap: Record<UserRole, UserInfo> = {
+  admin: {
+    id: 1,
+    username: 'admin',
+    nickname: '平台管理员',
+    role: 'admin',
+    status: 'enabled',
+    createdAt: '2026-05-18'
+  },
+  manager: {
+    id: 2,
+    username: 'manager',
+    nickname: '运营经理',
+    role: 'manager',
+    status: 'enabled',
+    createdAt: '2026-05-18'
+  },
+  staff: {
+    id: 3,
+    username: 'staff',
+    nickname: '运营员工',
+    role: 'staff',
+    status: 'enabled',
+    createdAt: '2026-05-18'
+  }
+}
+
+function getMockRoleFromToken(): UserRole {
+  const token = localStorage.getItem('token')
+
+  if (token === 'mock-token-manager') {
+    return 'manager'
+  }
+
+  if (token === 'mock-token-staff') {
+    return 'staff'
+  }
+
+  return 'admin'
+}
+
 export function getUserInfo(): Promise<ApiResponse<UserInfo>> {
+  const role = getMockRoleFromToken()
+
   return request<UserInfo>({
     url: '/user/info',
     adapter: createMockAdapter(200, {
       code: 0,
       message: '请求成功',
-      data: {
-        id: 1,
-        username: 'admin',
-        nickname: '平台管理员',
-        role: 'admin',
-        status: 'enabled',
-        createdAt: '2026-05-18'
-      }
+      data: mockUserInfoMap[role]
     })
   })
 }

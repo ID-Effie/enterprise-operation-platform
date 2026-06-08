@@ -40,6 +40,7 @@ import AppHeader from '@/components/AppHeader.vue'
 import AppMain from '@/components/AppMain.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
+import { usePermissionStore } from '@/stores/permission'
 
 // 菜单 path 要和路由 path 对上,否则点击菜单会进入 404 或空页面。
 
@@ -48,10 +49,21 @@ const router = useRouter() // 路由实例，可以跳转
 const menus = ref<MenuItem[]>([])
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const permissionStore = usePermissionStore()
 
 onMounted(async () => {
   const res = await getUserMenus()
-  menus.value = res.data
+  menus.value = res.data.filter((menu) => {
+    if (!menu.permission) {
+      return true
+    }
+
+    return permissionStore.hasPermissions(menu.permission)
+  })
+
+  // 你的侧边栏本来就是通过 AppSidebar -> AppSideMenu 渲染 menus，
+  // 所以这里一过滤，侧边栏自然就变成权限菜单。
+  permissionStore.setMenus(menus.value.map((menu) => menu.path))
 })
 
 const currentTitle = computed(() => {

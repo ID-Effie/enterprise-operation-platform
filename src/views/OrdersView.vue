@@ -1,8 +1,10 @@
 <template>
   <PageContainer title="订单列表" description="用于承载订单状态、订单金额和订单处理动作。">
     <template #actions>
-      <button type="button" class="primary-link" @click="openCreate">创建订单</button>
-      <button type="button" class="secondary-link">批量处理</button>
+      <button v-permission="'order:create'" type="button" class="primary-link" @click="openCreate">
+        创建订单
+      </button>
+      <button v-permission="'order:batch'" type="button" class="secondary-link">批量处理</button>
     </template>
 
     <section class="query-panel" aria-label="订单查询区">
@@ -50,7 +52,14 @@
             />
           </span>
           <span>
-            <button type="button" class="table-action" @click="openEdit(order)">编辑</button>
+            <button
+              v-permission="'order:update'"
+              type="button"
+              class="table-action"
+              @click="openEdit(order)"
+            >
+              编辑
+            </button>
           </span>
         </div>
       </div>

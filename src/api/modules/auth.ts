@@ -1,30 +1,76 @@
+/**
+ * admin / 123456     管理员
+ * manager / 123456   经理
+ * staff / 123456     员工
+ */
 import { request } from '../request'
 import { createMockAdapter } from '../mockAdapter'
 import type { ApiResponse } from '@/types/common'
-import type { LoginParams, LoginResult } from '@/types/user'
+import type { LoginParams, LoginResult, UserInfo, UserRole } from '@/types/user'
+
+const userMap: Record<UserRole, string> = {
+  admin: '123456',
+  manager: '123456',
+  staff: '123456'
+}
+
+const mockUserInfoMap: Record<UserRole, UserInfo> = {
+  admin: {
+    id: 1,
+    username: 'admin',
+    nickname: '平台管理员',
+    role: 'admin',
+    status: 'enabled',
+    createdAt: '2026-05-18'
+  },
+  manager: {
+    id: 2,
+    username: 'manager',
+    nickname: '运营经理',
+    role: 'manager',
+    status: 'enabled',
+    createdAt: '2026-05-18'
+  },
+  staff: {
+    id: 3,
+    username: 'staff',
+    nickname: '运营员工',
+    role: 'staff',
+    status: 'enabled',
+    createdAt: '2026-05-18'
+  }
+}
+
+function isUserRole(username: string): username is UserRole {
+  return username in userMap
+}
 
 // Promise<ApiResponse<LoginResult>>：
 // login 是一个异步函数，成功后返回统一响应结构，响应里的 data 是 LoginResult 类型
 export function login(params: LoginParams): Promise<ApiResponse<LoginResult>> {
-  const isValid = params.username === 'admin' && params.password === '123456'
+  // const isValid = params.username === 'admin' && params.password === '123456'
+
+  const isValid = () => {
+    if (!isUserRole(params.username)) {
+      return false
+    }
+
+    return userMap[params.username] === params.password
+  }
+
+  const userRole = isUserRole(params.username) ? params.username : 'staff'
 
   return request<LoginResult>({
     url: '/auth/login',
     method: 'POST',
     data: params,
     adapter: createMockAdapter(200, {
-      code: isValid ? 0 : 10001,
-      message: isValid ? '登录成功' : '账号或密码错误',
-      data: isValid
+      code: isValid() ? 0 : 10001,
+      message: isValid() ? '登录成功' : '账号或密码错误',
+      data: isValid()
         ? {
-            token: 'mock-token-001',
-            userInfo: {
-              id: 1,
-              username: 'admin',
-              role: 'admin',
-              status: 'enabled',
-              createdAt: '2026-05-18'
-            }
+            token: `mock-token-${userRole}`,
+            userInfo: mockUserInfoMap[userRole]
           }
         : null
     })
