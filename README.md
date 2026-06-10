@@ -81,8 +81,8 @@
   - `PageContainer` 已使用 `PageContainerProps` 管理 `title`、`description` props 类型
   - 已从 `BasicLayout` 中拆出 `AppSideMenu`，使用 `MenuItem[]` 管理菜单 props
   - `AppSideMenu` 已使用 `defineEmits` 定义 `select` 事件，事件参数类型复用 `MenuItem["path"]`
-  - 已从 `BasicLayout` 中拆出顶部栏组件 `AppToBar`，使用 props 管理标题和用户名
-  - `AppToBar` 已使用 `defineEmits` 定义无参数 `logout` 事件
+  - 已从 `BasicLayout` 中拆出顶部栏组件 `AppHeader`，使用 props 管理标题和用户名
+  - `AppHeader` 已使用 `defineEmits` 定义无参数 `logout` 事件
   - 已抽取 `StatusTag` 状态标签组件，使用 `StatusColor` 收窄颜色类型
   - 用户列表和订单列表已通过 `StatusTag` 展示状态文案和状态颜色
   - 用户状态、订单状态已从页面数据流转到统一状态映射，再传入 `StatusTag`
@@ -220,12 +220,21 @@
   - `MenuItem.permission` 已收窄为 `PermissionCode`，菜单权限码和路由权限码保持一致
   - 已输出 RBAC 权限设计文档：[rbac-permission-design-v1.md](docs/rbac-permission-design-v1.md)
   - 已沉淀 Day 29 学习笔记：`/Users/szy/Desktop/Plan/notes/day29-rbac-permission-design-notes.md`
+- Day 30：动态路由与菜单权限闭环
+  - 已明确主项目当前采用“静态业务路由 + `meta.permission` + 路由守卫兜底”的权限方案
+  - `permissionStore` 已补充 `hasRoutePermission()`，用于表达页面路由权限判断
+  - 路由守卫会在刷新后通过 `authStore.restoreSession()` 恢复用户和权限，再判断当前页面权限
+  - 侧边栏菜单继续来自 `getUserMenus()`，并通过 `permissionStore.hasPermissions()` 过滤可见菜单
+  - 菜单权限和路由 `meta.permission` 保持一致，避免菜单和页面权限错位
+  - 无权限访问业务页面会跳转 `/403`，不存在路径继续进入 404
+  - 已整理 Day 30 学习笔记：`/Users/szy/Desktop/Plan/notes/day30-dynamic-route-menu-permission-notes.md`
 
 ## 项目文档
 
 - [项目目录设计 v1](docs/project-directory-design-v1.md)：说明主项目目录拆分、职责边界和后续扩展方向。
 - [请求层设计 v1](docs/request-layer-design-v1.md)：说明 Axios 请求实例、拦截器、mock adapter、错误处理和接口模块边界。
 - [RBAC 权限设计 v1](docs/rbac-permission-design-v1.md)：说明用户、角色、权限、菜单、路由和按钮的权限模型。
+- [Day 30 动态路由与菜单生成笔记](/Users/szy/Desktop/Plan/notes/day30-dynamic-route-menu-permission-notes.md)：说明动态路由、菜单过滤、403 和刷新恢复的完整流程。
 
 ## 目录结构
 
@@ -233,12 +242,16 @@
 - src/components：通用组件
   - `PageContainer.vue`：业务页面容器
   - `AppSideMenu.vue`：侧边栏菜单组件
-  - `AppToBar.vue`：顶部栏组件
+  - `AppSidebar.vue`：侧边栏容器组件
+  - `AppHeader.vue`：顶部栏组件
+  - `AppMain.vue`：内容区容器组件
   - `StatusTag.vue`：状态标签组件
 - src/layouts：布局组件
 - src/router：路由配置
 - src/stores：状态管理
-  - `auth.ts`：登录状态 store，集中管理 token、用户信息、角色、权限和登录退出动作
+  - `auth.ts`：登录状态 store，集中管理 token、登录、退出和刷新恢复
+  - `user.ts`：当前用户信息 store，派生用户名和角色
+  - `permission.ts`：权限 store，管理权限点、可见菜单路径和权限判断
 - src/composables：组合式函数
   - `usePagination.ts`：列表分页状态、总数、总页数和分页方法
   - `useModal.ts`：新增/编辑弹窗状态、模式和当前行数据
@@ -373,7 +386,7 @@ meta: {
   - `AppSideMenu`
   - 使用 `MenuItem[]` 接收菜单数据
   - 使用 `select` 事件向布局层回传菜单路径
-  - `AppToBar`
+  - `AppHeader`
   - 使用 `title`、`username` 管理顶部栏展示内容
   - 使用 `logout` 事件通知布局层执行退出登录
   - `StatusTag`
@@ -605,7 +618,7 @@ pnpm run build
 - 系统管理页能按配置名称和配置类型筛选配置列表
 - 系统管理页点击重置后能恢复全部 mock 配置数据
 - 订单状态和用户状态能通过统一状态映射展示中文文案和颜色标签
-- `PageContainer`、`AppSideMenu`、`AppToBar`、`StatusTag` 的 props/emits 均有明确类型
+- `PageContainer`、`AppSideMenu`、`AppSidebar`、`AppHeader`、`AppMain`、`StatusTag` 的 props/emits 均有明确类型
 - `StatusTag` 的颜色类型使用 `StatusColor`，避免写成过宽的 `string`
 - 用户页和订单页能通过 `StatusTag` 复用状态标签展示
 - Pinia 已通过 `createPinia()` 接入主应用
@@ -613,6 +626,7 @@ pnpm run build
 - `authStore` 管理 `token`、登录、退出和刷新恢复
 - `userStore` 管理当前用户信息和角色派生
 - `permissionStore` 管理当前权限点、可见菜单路径和权限判断
+- `permissionStore.hasRoutePermission()` 负责表达页面路由权限判断
 - `PermissionCode` 统一约束菜单、路由和按钮使用的权限码
 - `getPermissionsByRole(role)` 统一根据角色生成当前权限列表
 - 登录页通过 `authStore.login()` 更新登录状态
@@ -648,6 +662,7 @@ pnpm run build
 - mock 返回结果通过 Axios adapter 提供，请求参数仍通过 `params` 或 `data` 表达
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
 - 侧边栏菜单会根据当前角色权限过滤，operator 只看到首页、客户管理、订单管理
+- 菜单权限和路由 `meta.permission` 保持一致，避免菜单显示和页面访问错位
 - 登录页不显示后台布局
 - 登录页输入 `admin`、`manager`、`operator` 任一 mock 账号和 `123456` 后能跳转 `/dashboard`
 - 登录页输入错误账号或密码时能展示错误提示
@@ -659,6 +674,9 @@ pnpm run build
 - 后台业务路由均作为 `BasicLayout` 的子路由展示，不再重复嵌套空子路由
 - 后台业务路由均具备 `title`、`requiresAuth`、`permission`
 - 缺少页面权限时会跳转 `/403`
+- operator 手动访问 `/users`、`/system` 会跳转 `/403`
+- manager 手动访问 `/system` 会跳转 `/403`
+- admin 访问 `/system` 能正常进入
 - 点击退出登录后会清理 `token` 并返回登录页
 - `/403` 页面显示无权限提示
 - 不存在的路径能进入 404 页面
