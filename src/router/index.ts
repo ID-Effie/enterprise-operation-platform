@@ -147,7 +147,8 @@ router.beforeEach(async (to) => {
     await authStore.restoreSession()
   }
 
-  if (to.meta.permission && !permissionStore.hasPermissions(to.meta.permission as string)) {
+  // 页面路由权限判断
+  if (!permissionStore.hasRoutePermission(to.meta.permission as string | undefined)) {
     return '/403'
   }
 

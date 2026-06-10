@@ -28,6 +28,13 @@ export const usePermissionStore = defineStore('permission', {
     clearPermission() {
       this.permissions = []
       this.menus = []
+    },
+
+    hasRoutePermission(permission?: string) {
+      if (!permission) {
+        return true
+      }
+      return this.permissions.includes(permission)
     }
   }
 })
