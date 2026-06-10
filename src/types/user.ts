@@ -6,7 +6,7 @@
 
 import type { ID, ListQuery } from './common'
 
-export type UserRole = 'admin' | 'manager' | 'staff'
+export type UserRole = 'admin' | 'manager' | 'operator'
 
 export type UserStatus = 'enabled' | 'disabled'
 

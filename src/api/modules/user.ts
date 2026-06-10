@@ -27,11 +27,11 @@ const mockUserInfoMap: Record<UserRole, UserInfo> = {
     status: 'enabled',
     createdAt: '2026-05-18'
   },
-  staff: {
+  operator: {
     id: 3,
-    username: 'staff',
+    username: 'operator',
     nickname: '运营员工',
-    role: 'staff',
+    role: 'operator',
     status: 'enabled',
     createdAt: '2026-05-18'
   }
@@ -44,8 +44,8 @@ function getMockRoleFromToken(): UserRole {
     return 'manager'
   }
 
-  if (token === 'mock-token-staff') {
-    return 'staff'
+  if (token === 'mock-token-operator') {
+    return 'operator'
   }
 
   return 'admin'
@@ -80,7 +80,7 @@ export function getUserList(params: UserListQuery): Promise<ApiResponse<PageResu
         id: 2,
         username: 'operator',
         nickname: '运营人员',
-        role: 'staff',
+        role: 'operator',
         status: 'enabled',
         createdAt: '2026-05-18'
       }

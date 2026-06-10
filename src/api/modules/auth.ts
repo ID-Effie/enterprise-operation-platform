@@ -1,7 +1,7 @@
 /**
  * admin / 123456     管理员
  * manager / 123456   经理
- * staff / 123456     员工
+ * operator / 123456     员工
  */
 import { request } from '../request'
 import { createMockAdapter } from '../mockAdapter'
@@ -11,7 +11,7 @@ import type { LoginParams, LoginResult, UserInfo, UserRole } from '@/types/user'
 const userMap: Record<UserRole, string> = {
   admin: '123456',
   manager: '123456',
-  staff: '123456'
+  operator: '123456'
 }
 
 const mockUserInfoMap: Record<UserRole, UserInfo> = {
@@ -31,11 +31,11 @@ const mockUserInfoMap: Record<UserRole, UserInfo> = {
     status: 'enabled',
     createdAt: '2026-05-18'
   },
-  staff: {
+  operator: {
     id: 3,
-    username: 'staff',
+    username: 'operator',
     nickname: '运营员工',
-    role: 'staff',
+    role: 'operator',
     status: 'enabled',
     createdAt: '2026-05-18'
   }
@@ -58,7 +58,7 @@ export function login(params: LoginParams): Promise<ApiResponse<LoginResult>> {
     return userMap[params.username] === params.password
   }
 
-  const userRole = isUserRole(params.username) ? params.username : 'staff'
+  const userRole = isUserRole(params.username) ? params.username : 'operator'
 
   return request<LoginResult>({
     url: '/auth/login',

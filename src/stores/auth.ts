@@ -13,42 +13,10 @@ import type { LoginParams } from '@/types/user'
 import { useUserStore } from '@/stores/user'
 import { usePermissionStore } from '@/stores/permission'
 import { getUserInfo } from '@/api/modules/user'
+import { getPermissionsByRole } from '@/api/mock/rbac'
 
 interface AuthState {
   token: string
-}
-
-const rolePermissionMap = {
-  admin: [
-    'dashboard:view',
-    'customer:list',
-    'order:list',
-    'user:list',
-    'system:manage',
-    'customer:create',
-    'customer:export',
-    'order:create',
-    'order:batch',
-    'order:update',
-    'user:create',
-    'user:update',
-    'user:assign-role',
-    'role:create',
-    'role:update'
-  ],
-  manager: [
-    'dashboard:view',
-    'customer:list',
-    'order:list',
-    'user:list',
-    'customer:create',
-    'customer:export',
-    'order:create',
-    'order:update',
-    'user:create',
-    'user:update'
-  ],
-  staff: ['dashboard:view', 'customer:list', 'order:list']
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -84,7 +52,7 @@ export const useAuthStore = defineStore('auth', {
       // 因为你当前项目里的 UserInfo (line 14) 只有一个 role 字段，不是数组。
       // 但计划要求 store 里有 roles，所以这里先把单个角色包装成数组
       // 以后如果后端返回 roles: UserRole[]，这里再改就行。
-      permissionStore.setPermissions(rolePermissionMap[role])
+      permissionStore.setPermissions(getPermissionsByRole(role))
 
       // 把 token 存进 localStorage，方便刷新后恢复：
       localStorage.setItem('token', res.data.token)
@@ -112,10 +80,10 @@ export const useAuthStore = defineStore('auth', {
         const res = await getUserInfo()
         const userInfo = res.data
 
-        // 根据 userInfo.role 从 rolePermissionMap 找权限
+        // 根据 userInfo.role 从 getPermissionsByRole(role) 找权限
         // 写入 userStore 和 permissionStore
         userStore.setUserInfo(userInfo)
-        permissionStore.setPermissions(rolePermissionMap[userInfo.role])
+        permissionStore.setPermissions(getPermissionsByRole(userInfo.role))
       } catch {
         this.token = ''
         userStore.clearUserInfo()

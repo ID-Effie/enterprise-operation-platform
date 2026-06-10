@@ -165,7 +165,7 @@
   - 已确认 `tsconfig.app.json` 中通过 `paths` 配置 `@/*` 指向 `./src/*`
   - 已明确 TypeScript 6 下不再依赖 `baseUrl`，路径映射目标使用 `./src/*`
   - 已梳理 `constants`、`types`、`utils` 的职责区别
-  - 已输出项目目录设计文档：`docs/project-directory-design-v1.md`
+  - 已输出项目目录设计文档：[project-directory-design-v1.md](docs/project-directory-design-v1.md)
   - 已沉淀 Day 22 学习笔记：`notes/day22-vite-project-structure-env-alias-notes.md`
 - Day 23：Router 与路由元信息整理
   - 已整理主项目路由模块，明确登录路由、基础布局路由、业务模块路由和异常页路由
@@ -188,6 +188,7 @@
   - `auth.ts`、`user.ts`、`customer.ts`、`order.ts`、`menu.ts` 已统一改为通过 `adapter: createMockAdapter(...)` 模拟接口
   - 已用 200、业务错误、500、401 四类响应验证拦截器分支
   - 已确认页面层没有重复处理全局 401、500、网络错误逻辑
+  - 已输出请求层设计文档：[request-layer-design-v1.md](docs/request-layer-design-v1.md)
   - 已沉淀 Day 25 学习笔记：`notes/day25-axios-request-wrapper-notes.md`
 - Day 26：代码规范与提交规范
   - 已新增 `eslint.config.js`，接入 JavaScript、TypeScript、Vue 推荐规则
@@ -201,7 +202,7 @@
   - 已通过 `pnpm run format`、`pnpm run lint`、`pnpm run build` 验证
   - 已沉淀 Day 26 学习笔记：`notes/day26-code-style-commit-standard-notes.md`
 - Day 27：权限骨架与菜单生成
-  - 已建立 `admin`、`manager`、`staff` 三类 mock 账号和角色权限映射
+  - 已建立 `admin`、`manager`、`operator` 三类 mock 账号和角色权限映射
   - `authStore` 负责登录、退出和 `restoreSession()` 会话恢复
   - `userStore` 负责当前用户信息和角色派生
   - `permissionStore` 负责当前权限点、菜单路径和 `hasPermissions()` 判断
@@ -209,8 +210,22 @@
   - `BasicLayout` 已根据 `permissionStore.permissions` 过滤侧边栏菜单
   - 路由守卫已在刷新后通过 `restoreSession()` 恢复用户和权限，再进行页面权限判断
   - 客户、订单、用户、系统页面的操作按钮已通过 `v-permission` 接入按钮权限
-  - 已验证 staff 登录不会再被错误恢复为 admin 权限
+  - 已验证 operator 登录不会再被错误恢复为 admin 权限
   - 已沉淀 Day 27 学习笔记：`/Users/szy/Desktop/Plan/notes/day27-permission-menu-filtering-notes.md`
+- Day 29：RBAC 权限模型设计
+  - 已将角色统一为 `admin`、`manager`、`operator`
+  - 已新增 `src/types/permission.ts`，沉淀 `PermissionCode`、`PermissionItem`、`RolePermission`
+  - 已新增 `src/api/mock/rbac.ts`，集中维护角色与权限码映射
+  - `authStore` 已通过 `getPermissionsByRole(role)` 计算当前用户权限，避免权限映射散落在 store 中
+  - `MenuItem.permission` 已收窄为 `PermissionCode`，菜单权限码和路由权限码保持一致
+  - 已输出 RBAC 权限设计文档：[rbac-permission-design-v1.md](docs/rbac-permission-design-v1.md)
+  - 已沉淀 Day 29 学习笔记：`/Users/szy/Desktop/Plan/notes/day29-rbac-permission-design-notes.md`
+
+## 项目文档
+
+- [项目目录设计 v1](docs/project-directory-design-v1.md)：说明主项目目录拆分、职责边界和后续扩展方向。
+- [请求层设计 v1](docs/request-layer-design-v1.md)：说明 Axios 请求实例、拦截器、mock adapter、错误处理和接口模块边界。
+- [RBAC 权限设计 v1](docs/rbac-permission-design-v1.md)：说明用户、角色、权限、菜单、路由和按钮的权限模型。
 
 ## 目录结构
 
@@ -234,6 +249,7 @@
 - src/api：接口请求
   - `request.ts`：统一请求入口和响应结构
   - `mockAdapter.ts`：开发阶段通过 Axios adapter 模拟后端响应
+  - `mock/rbac.ts`：开发阶段 RBAC 角色权限 mock 数据
   - `modules/auth.ts`：认证相关接口
   - `modules/user.ts`：用户相关接口
   - `modules/menu.ts`：菜单相关接口
@@ -245,6 +261,7 @@
 - src/types：类型定义
   - `common.ts`：通用类型、统一响应结构、分页类型
   - `user.ts`：用户、角色、登录相关类型
+  - `permission.ts`：权限码、权限项、角色权限关系相关类型
   - `menu.ts`：菜单、权限菜单相关类型
   - `customer.ts`：客户列表相关类型
   - `order.ts`：订单列表相关类型
@@ -425,7 +442,8 @@ meta: {
   - 支持 `v-permission="['user:create', 'admin']"` 多权限写法
   - 使用 `display: none` 控制无权限按钮展示
 - 权限骨架：
-  - `auth.ts` 中通过 `rolePermissionMap` 维护当前 mock 角色权限
+  - `src/api/mock/rbac.ts` 中通过 `rolePermissions` 维护当前 mock 角色权限
+  - `authStore` 中通过 `getPermissionsByRole(role)` 计算当前用户权限
   - `menu.ts` 中菜单项通过 `permission` 声明可见条件
   - `BasicLayout` 根据权限过滤菜单，并把可见菜单路径写入 `permissionStore.menus`
   - `router.beforeEach` 根据 `meta.permission` 拦截无权限页面
@@ -502,16 +520,16 @@ http://localhost:5173/
 ```text
 admin / 123456
 manager / 123456
-staff / 123456
+operator / 123456
 ```
 
 4. 使用 `admin` 登录，确认侧边栏显示首页、客户管理、订单管理、用户管理、系统管理。
 5. 使用 `manager` 登录，确认侧边栏显示首页、客户管理、订单管理、用户管理，不显示系统管理。
-6. 使用 `staff` 登录，确认侧边栏只显示首页、客户管理、订单管理。
-7. 使用 `staff` 进入客户管理，确认“新增客户”“导出列表”按钮隐藏。
-8. 使用 `staff` 进入订单管理，确认“创建订单”“批量处理”“编辑”按钮隐藏。
-9. 使用 `staff` 手动访问 `/users`，确认跳转 `/403`。
-10. 使用 `staff` 手动访问 `/system`，确认跳转 `/403`。
+6. 使用 `operator` 登录，确认侧边栏只显示首页、客户管理、订单管理。
+7. 使用 `operator` 进入客户管理，确认“新增客户”“导出列表”按钮隐藏。
+8. 使用 `operator` 进入订单管理，确认“创建订单”“批量处理”“编辑”按钮隐藏。
+9. 使用 `operator` 手动访问 `/users`，确认跳转 `/403`。
+10. 使用 `operator` 手动访问 `/system`，确认跳转 `/403`。
 11. 登录后刷新页面，确认 `restoreSession()` 能恢复当前角色权限，菜单和按钮不会错乱。
 12. 访问一个不存在的路径，例如 `/not-exist`，确认进入 404 页面。
 13. 点击顶部栏的退出按钮，确认清理登录状态并返回 `/login`。
@@ -595,6 +613,8 @@ pnpm run build
 - `authStore` 管理 `token`、登录、退出和刷新恢复
 - `userStore` 管理当前用户信息和角色派生
 - `permissionStore` 管理当前权限点、可见菜单路径和权限判断
+- `PermissionCode` 统一约束菜单、路由和按钮使用的权限码
+- `getPermissionsByRole(role)` 统一根据角色生成当前权限列表
 - 登录页通过 `authStore.login()` 更新登录状态
 - `vue-tsc` 类型检查通过
 - `request<T>()` 返回 `Promise<ApiResponse<T>>`
@@ -627,9 +647,9 @@ pnpm run build
 - 权限指令只控制前端按钮展示，不能替代后端接口鉴权
 - mock 返回结果通过 Axios adapter 提供，请求参数仍通过 `params` 或 `data` 表达
 - 侧边栏菜单来自 `getUserMenus()`，不是组件内静态数组
-- 侧边栏菜单会根据当前角色权限过滤，staff 只看到首页、客户管理、订单管理
+- 侧边栏菜单会根据当前角色权限过滤，operator 只看到首页、客户管理、订单管理
 - 登录页不显示后台布局
-- 登录页输入 `admin`、`manager`、`staff` 任一 mock 账号和 `123456` 后能跳转 `/dashboard`
+- 登录页输入 `admin`、`manager`、`operator` 任一 mock 账号和 `123456` 后能跳转 `/dashboard`
 - 登录页输入错误账号或密码时能展示错误提示
 - 登录过程中按钮进入禁用状态
 - 未登录访问 `/dashboard`、`/customers`、`/orders`、`/users`、`/system` 会跳转登录页

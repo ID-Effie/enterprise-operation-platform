@@ -5,6 +5,7 @@
  */
 
 import type { ID } from './common'
+import type { PermissionCode } from './permission'
 
 // MenuType 可以区分目录、菜单、按钮。
 export type MenuType = 'catalog' | 'menu' | 'button'
@@ -17,6 +18,6 @@ export interface MenuItem {
   icon?: string
   type: MenuType
   parentId?: ID
-  permission?: string // permission 可以用于按钮权限
+  permission?: PermissionCode // permission 可以用于按钮权限,菜单上的权限码必须来自统一的 PermissionCode，不容易写错
   children?: MenuItem[] // children?: MenuItem[] 表示菜单可以递归嵌套
 }

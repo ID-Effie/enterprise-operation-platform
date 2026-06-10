@@ -176,7 +176,7 @@ function formatUserRole(role: UserInfo['role']) {
   const roleMap: Record<UserInfo['role'], string> = {
     admin: '管理员',
     manager: '经理',
-    staff: '员工'
+    operator: '员工'
   }
   return roleMap[role]
 }
